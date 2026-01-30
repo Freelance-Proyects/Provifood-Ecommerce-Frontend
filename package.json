@@ -1,0 +1,25 @@
+{
+  "name": "provifood-ecommerce",
+  "version": "1.0.0",
+  "description": "Provifood E-commerce Monorepo",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "pnpm": ">=8.0.0",
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev:store": "pnpm --filter=@provifood/store dev",
+    "dev:admin": "pnpm --filter=@provifood/admin dev",
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "build:store": "pnpm --filter=@provifood/store build",
+    "build:admin": "pnpm --filter=@provifood/admin build",
+    "preview": "pnpm -r preview",
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

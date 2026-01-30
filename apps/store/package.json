@@ -1,0 +1,25 @@
+{
+  "name": "@provifood/store",
+  "version": "1.0.0",
+  "description": "Provifood Public E-commerce Store",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@provifood/types": "workspace:*",
+    "astro": "^4.0.0",
+    "@astrojs/vue": "^4.0.0",
+    "@astrojs/tailwind": "^4.0.0",
+    "vue": "^3.3.11",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
