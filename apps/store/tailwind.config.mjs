@@ -7,7 +7,7 @@ export default {
     extend: {
       colors: {
         'provifood': {
-          'primary': '#155E58',      // Verde petróleo/teal principal
+          'primary': '#156F70',      // Verde petróleo/teal principal
           'secondary': '#F08200',    // Naranja
           'dark': '#333333',         // Texto oscuro
           'gray': '#666666',         // Texto gris medio

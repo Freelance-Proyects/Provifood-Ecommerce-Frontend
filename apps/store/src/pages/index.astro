@@ -207,28 +207,6 @@ const featuredProducts = [
     </div>
   </section>
   
-  <!-- Banner informativo para empresas -->
-  <section class="bg-gradient-to-r from-amber-50 to-orange-50 py-10">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="flex items-center space-x-5">
-          <div class="w-20 h-20 bg-provifood-secondary rounded-full flex items-center justify-center flex-shrink-0">
-            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-2xl font-bold text-provifood-dark mb-1">¿Eres una empresa?</h3>
-            <p class="text-provifood-gray text-base">Registra tu empresa y accede a PRECIOS MAYORISTAS</p>
-          </div>
-        </div>
-        <Button href="/registro-empresa" variant="secondary" size="lg" class="flex-shrink-0">
-          Registrar Mi Empresa
-        </Button>
-      </div>
-    </div>
-  </section>
-  
   <!-- Sección de productos destacados -->
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
@@ -302,14 +280,55 @@ const featuredProducts = [
     </div>
   </section>
   
-  <!-- Call to Action -->
+  <!-- Call to Action B2B -->
   <section class="bg-provifood-primary text-white py-20">
     <div class="container mx-auto px-4">
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-3xl md:text-5xl font-bold mb-5">¿Necesitas un Presupuesto Personalizado?</h2>
-        <p class="text-lg md:text-xl text-gray-100 mb-10 max-w-2xl mx-auto">
+        <div class="inline-flex items-center space-x-2 bg-provifood-secondary px-4 py-2 rounded-full text-sm font-bold mb-6">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <span class="text-white">Soluciones B2B</span>
+        </div>
+        
+        <h2 class="text-3xl md:text-5xl font-bold mb-5 text-white">¿Necesitas un Presupuesto Personalizado?</h2>
+        <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
           Nuestro equipo comercial está listo para ayudarte a encontrar los mejores productos y precios para tu negocio
         </p>
+        
+        <!-- Beneficios B2B -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div class="w-12 h-12 bg-provifood-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="font-bold text-white text-lg mb-2">Precios Mayoristas</h3>
+            <p class="text-sm text-white/80">Descuentos especiales por volumen</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div class="w-12 h-12 bg-provifood-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
+            <h3 class="font-bold text-white text-lg mb-2">Asesoría Personalizada</h3>
+            <p class="text-sm text-white/80">Ejecutivo dedicado a tu cuenta</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div class="w-12 h-12 bg-provifood-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="font-bold text-white text-lg mb-2">Entrega Programada</h3>
+            <p class="text-sm text-white/80">Despachos según tus necesidades</p>
+          </div>
+        </div>
+        
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <Button href="/contacto" variant="secondary" size="lg">
             Solicitar Presupuesto
@@ -324,6 +343,10 @@ const featuredProducts = [
       </div>
     </div>
   </section>
+  
+  <!-- Trama decorativa -->
+  <div class="w-full h-16" style="background-image: url('/banner.png'); background-repeat: repeat-x; background-size: auto 100%; background-position: center;">
+  </div>
   
   <!-- Footer -->
   <Footer />
