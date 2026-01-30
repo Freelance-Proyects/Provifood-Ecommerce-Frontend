@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Configuración de Open Sans como fuente por defecto */
+  body {
+    font-family: 'Open Sans', 'Roboto', system-ui, -apple-system, sans-serif;
+  }
+  
+  /* Tipografía base */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-provifood-dark;
+  }
+  
+  p {
+    @apply text-provifood-gray;
+  }
+}
+
+@layer components {
+  /* Botón primario */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-provifood-primary text-white font-semibold rounded-provifood transition-all duration-200 hover:bg-teal-700;
+  }
+  
+  /* Botón secundario */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-provifood-secondary text-white font-semibold rounded-provifood transition-all duration-200 hover:bg-orange-600;
+  }
+  
+  /* Botón outline */
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-6 py-3 border-2 border-provifood-primary text-provifood-primary font-semibold rounded-provifood transition-all duration-200 hover:bg-provifood-primary hover:text-white;
+  }
+  
+  /* Card de producto */
+  .product-card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl;
+  }
+  
+  /* Container personalizado */
+  .container {
+    @apply mx-auto px-4 max-w-7xl;
+  }
+}
+
+@layer utilities {
+  /* Utilidades personalizadas */
+  .text-balance {
+    text-wrap: balance;
+  }
+}

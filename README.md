@@ -98,16 +98,36 @@ pnpm type-check
 ```
 store/
 ├── src/
+│   ├── components/     # Componentes organizados por tipo
+│   │   ├── ui/         # Componentes UI reutilizables
+│   │   │   └── Button.astro
+│   │   ├── layout/     # Componentes de estructura
+│   │   │   ├── TopBar.astro
+│   │   │   ├── Navbar.astro
+│   │   │   ├── Footer.astro
+│   │   │   └── CategoryMenu.astro
+│   │   └── features/   # Componentes por feature
+│   │       └── products/
+│   │           └── ProductCard.astro
+│   ├── lib/            # Utilidades y helpers
+│   │   ├── constants/  # Configuraciones estáticas
+│   │   │   ├── categories.ts
+│   │   │   └── site.ts
+│   │   └── utils/      # Funciones helper
+│   │       └── format.ts
 │   ├── pages/          # Rutas de la aplicación
 │   │   └── index.astro # Página principal
 │   ├── layouts/        # Layouts compartidos
 │   │   └── Layout.astro
+│   ├── styles/         # Estilos globales
+│   │   └── global.css
 │   └── env.d.ts
 ├── public/             # Assets estáticos
-│   └── favicon.svg
-├── astro.config.mjs    # Config de Astro
+│   ├── logo.png
+│   └── navlogo.png
+├── astro.config.mjs    # Config de Astro + Path Aliases
 ├── tailwind.config.mjs # Config de Tailwind
-└── tsconfig.json
+└── tsconfig.json       # TypeScript config
 ```
 
 ### `/apps/admin` (Vue 3)
@@ -153,6 +173,30 @@ const product: Product = {
   // ...
 }
 ```
+
+## 🎨 Path Aliases
+
+El proyecto usa path aliases para facilitar los imports:
+
+```typescript
+// En lugar de: import Button from '../../../components/ui/Button.astro'
+import Button from '@/components/ui/Button.astro'
+import { CATEGORIES } from '@/lib/constants'
+import { formatPrice } from '@/lib/utils'
+```
+
+## 📐 Arquitectura del Store
+
+El Store usa una **Estructura Híbrida** (Feature + Layer based):
+
+- **`components/ui/`**: Componentes reutilizables de UI (Button, Input, Badge, etc.)
+- **`components/layout/`**: Estructura de la página (TopBar, Navbar, Footer, etc.)
+- **`components/features/`**: Componentes específicos por feature (ProductCard, CartItem, etc.)
+- **`lib/constants/`**: Configuración estática (categorías, textos, config del sitio)
+- **`lib/utils/`**: Funciones helper puras (formateo, validaciones, etc.)
+- **`lib/api/`**: Clientes HTTP y fetchers (futuros)
+
+Ver [STRUCTURE.md](apps/store/src/STRUCTURE.md) para más detalles.
 
 ## 🌐 URLs de Desarrollo
 

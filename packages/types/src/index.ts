@@ -10,9 +10,9 @@ export interface Product {
   image: string;
   category: string;
   inStock: boolean;
-  quantity?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  quantity?: number | string; // Puede ser número o string (ej: "1kg", "500g")
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // ============================================

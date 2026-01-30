@@ -1,0 +1,56 @@
+---
+// Menú de categorías tipo supermercado
+const categories = [
+  { name: 'Harinas y Panificación', icon: 'bread', href: '/categoria/harinas' },
+  { name: 'Aceites y Grasas', icon: 'oil', href: '/categoria/aceites' },
+  { name: 'Pastas y Fideos', icon: 'pasta', href: '/categoria/pastas' },
+  { name: 'Arroz y Legumbres', icon: 'rice', href: '/categoria/arroz' },
+  { name: 'Azúcar y Endulzantes', icon: 'sugar', href: '/categoria/azucar' },
+  { name: 'Conservas', icon: 'can', href: '/categoria/conservas' },
+  { name: 'Condimentos', icon: 'spice', href: '/categoria/condimentos' },
+  { name: 'Bebidas', icon: 'drink', href: '/categoria/bebidas' },
+];
+---
+
+<div class="bg-gray-50 border-t border-b border-gray-200">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center overflow-x-auto scrollbar-hide py-3 space-x-1">
+      <!-- Botón de todas las categorías -->
+      <a href="/categorias" class="flex items-center space-x-2 px-4 py-2 bg-provifood-primary text-white rounded-lg hover:bg-teal-700 transition-colors whitespace-nowrap flex-shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <span class="font-semibold">Todas las Categorías</span>
+      </a>
+      
+      <!-- Categorías individuales -->
+      {categories.map((category) => (
+        <a 
+          href={category.href} 
+          class="flex items-center space-x-2 px-4 py-2 text-provifood-dark hover:bg-white hover:shadow-sm rounded-lg transition-all whitespace-nowrap"
+        >
+          <span class="font-medium text-sm">{category.name}</span>
+        </a>
+      ))}
+      
+      <!-- Ofertas destacadas -->
+      <a href="/ofertas" class="flex items-center space-x-2 px-4 py-2 bg-provifood-secondary text-white rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 ml-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+        </svg>
+        <span class="font-semibold">Ofertas</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

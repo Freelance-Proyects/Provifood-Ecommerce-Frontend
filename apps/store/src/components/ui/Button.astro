@@ -1,0 +1,38 @@
+---
+// Componente de botón reutilizable con el estilo de Provifood
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { 
+  href, 
+  variant = 'primary', 
+  size = 'md',
+  class: className = ''
+} = Astro.props;
+
+const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-200 rounded-provifood';
+
+const variantStyles = {
+  primary: 'bg-provifood-primary text-white hover:bg-teal-700',
+  secondary: 'bg-provifood-secondary text-white hover:bg-orange-600',
+  outline: 'border-2 border-provifood-primary text-provifood-primary hover:bg-provifood-primary hover:text-white'
+};
+
+const sizeStyles = {
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-lg'
+};
+
+const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
+
+const Component = href ? 'a' : 'button';
+---
+
+<Component href={href} class={classes}>
+  <slot />
+</Component>

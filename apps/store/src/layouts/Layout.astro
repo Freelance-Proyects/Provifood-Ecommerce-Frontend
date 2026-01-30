@@ -1,11 +1,12 @@
 ---
 import type { AstroGlobal } from 'astro';
+import '../styles/global.css';
 
 interface Props {
   title?: string;
 }
 
-const { title = 'Provifood Store' } = Astro.props;
+const { title = 'Provifood - Tu tienda de alimentos' } = Astro.props;
 ---
 
 <!doctype html>
@@ -13,10 +14,16 @@ const { title = 'Provifood Store' } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/navlogo.png" />
+    
+    <!-- Google Fonts - Open Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <title>{title}</title>
   </head>
-  <body class="bg-white">
+  <body class="bg-white font-sans text-provifood-dark">
     <slot />
   </body>
 </html>
