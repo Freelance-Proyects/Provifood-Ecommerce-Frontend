@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/layout/TopBar.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import Button from '../components/ui/Button.astro';
+---
+
+<Layout title="Página No Encontrada - Provifood">
+  <TopBar />
+  <Navbar />
+  
+  <!-- Página 404 -->
+  <section class="bg-gradient-to-b from-gray-50 to-white py-16 pb-0">
+    <div class="container mx-auto px-4 min-h-[calc(100vh-400px)] flex items-center justify-center">
+      <div class="max-w-2xl mx-auto text-center pb-16">
+        <!-- Número 404 grande -->
+        <div class="mb-8">
+          <h1 class="text-[140px] md:text-[200px] font-bold text-provifood-primary leading-none select-none">
+            404
+          </h1>
+        </div>
+        
+        <!-- Mensaje -->
+        <h2 class="text-3xl md:text-4xl font-bold text-provifood-dark mb-4">
+          ¡Oops! Página No Encontrada
+        </h2>
+        <p class="text-lg text-provifood-gray mb-8 max-w-md mx-auto">
+          Lo sentimos, la página que buscas no existe o ha sido movida. Verifica la URL o regresa al inicio.
+        </p>
+        
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <Button href="/" variant="primary" size="lg">
+            Volver al Inicio
+          </Button>
+          <Button href="/productos" variant="outline" size="lg">
+            Ver Productos
+          </Button>
+        </div>
+        
+        <!-- Enlaces rápidos -->
+        <div class="border-t border-gray-200 pt-8">
+          <p class="text-sm text-provifood-gray mb-4 font-semibold">Enlaces Útiles:</p>
+          <div class="flex flex-wrap gap-4 justify-center text-sm">
+            <a href="/" class="text-provifood-primary hover:text-provifood-secondary transition-colors">
+              Inicio
+            </a>
+            <span class="text-gray-300">|</span>
+            <a href="/productos" class="text-provifood-primary hover:text-provifood-secondary transition-colors">
+              Productos
+            </a>
+            <span class="text-gray-300">|</span>
+            <a href="/contacto" class="text-provifood-primary hover:text-provifood-secondary transition-colors">
+              Contacto
+            </a>
+            <span class="text-gray-300">|</span>
+            <a href="/nosotros" class="text-provifood-primary hover:text-provifood-secondary transition-colors">
+              Nosotros
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>
