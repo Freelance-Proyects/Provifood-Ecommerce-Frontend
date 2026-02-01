@@ -1,0 +1,244 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/layout/TopBar.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import CategoryMenu from '../components/layout/CategoryMenu.astro';
+import Footer from '../components/layout/Footer.astro';
+import ProductCard from '../components/features/products/ProductCard.astro';
+
+// Productos de ejemplo - En producción vendrían del backend
+const products = Array.from({ length: 24 }, (_, i) => ({
+  id: `${i + 1}`,
+  name: `Producto ${i + 1}`,
+  price: Math.floor(Math.random() * 5000) + 1000,
+  discount: i % 3 === 0 ? 15 : 0,
+  image: '',
+  inStock: i % 7 !== 0,
+  category: ['Frutas', 'Verduras', 'Lácteos', 'Carnes', 'Bebidas', 'Despensa'][Math.floor(Math.random() * 6)],
+  rating: 3.5 + Math.random() * 1.5
+}));
+---
+
+<Layout title="Todos los Productos - Provifood">
+  <TopBar />
+  <Navbar />
+  <CategoryMenu />
+  
+  <main class="bg-gray-50 min-h-screen">
+    <!-- Banner Principal -->
+    <section class="relative h-64 overflow-hidden bg-gradient-to-r from-provifood-primary to-teal-600">
+      <div class="absolute inset-0 bg-black/20"></div>
+      <div class="container mx-auto px-4 h-full flex items-center relative z-10">
+        <div>
+          <h1 class="text-4xl font-bold text-white mb-2">Todos los Productos</h1>
+          <p class="text-xl text-white/90">Encuentra todo lo que necesitas para tu negocio</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtros de Categorías Rápidas -->
+    <section class="bg-white border-b border-gray-200 py-6">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center gap-4 overflow-x-auto pb-2">
+          <button class="px-6 py-2 bg-provifood-primary text-white rounded-full font-semibold whitespace-nowrap hover:bg-provifood-primary/90 transition-colors">
+            Todos
+          </button>
+          <a href="/categoria/frutas-verduras" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Frutas y Verduras
+          </a>
+          <a href="/categoria/carnes-pescados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Carnes y Pescados
+          </a>
+          <a href="/categoria/lacteos" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Lácteos
+          </a>
+          <a href="/categoria/panaderia" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Panadería
+          </a>
+          <a href="/categoria/bebidas" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Bebidas
+          </a>
+          <a href="/categoria/despensa" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Despensa
+          </a>
+          <a href="/categoria/congelados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Congelados
+          </a>
+          <a href="/categoria/limpieza" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+            Limpieza
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex gap-8">
+        <!-- Sidebar de Filtros -->
+        <aside class="hidden lg:block w-64 flex-shrink-0">
+          <div class="bg-white rounded-lg shadow-sm sticky top-4">
+            <!-- Categorías -->
+            <div class="p-4 border-b border-gray-200">
+              <button class="flex items-center justify-between w-full text-left">
+                <h3 class="font-bold text-provifood-dark">Categorías</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="mt-3 space-y-2">
+                {[
+                  { name: 'Frutas y Verduras', href: '/categoria/frutas-verduras' },
+                  { name: 'Carnes y Pescados', href: '/categoria/carnes-pescados' },
+                  { name: 'Lácteos', href: '/categoria/lacteos' },
+                  { name: 'Panadería', href: '/categoria/panaderia' },
+                  { name: 'Bebidas', href: '/categoria/bebidas' },
+                  { name: 'Despensa', href: '/categoria/despensa' },
+                  { name: 'Congelados', href: '/categoria/congelados' },
+                  { name: 'Limpieza', href: '/categoria/limpieza' }
+                ].map((cat) => (
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" class="rounded text-provifood-primary focus:ring-provifood-primary" />
+                    <a href={cat.href} class="text-sm text-provifood-gray hover:text-provifood-primary">{cat.name}</a>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <!-- Marcas -->
+            <div class="p-4 border-b border-gray-200">
+              <button class="flex items-center justify-between w-full text-left">
+                <h3 class="font-bold text-provifood-dark">Marcas</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="mt-3 space-y-2">
+                {['Marca A', 'Marca B', 'Marca C', 'Marca D'].map((brand) => (
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" class="rounded text-provifood-primary focus:ring-provifood-primary" />
+                    <span class="text-sm text-provifood-gray">{brand}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <!-- Precio -->
+            <div class="p-4 border-b border-gray-200">
+              <button class="flex items-center justify-between w-full text-left">
+                <h3 class="font-bold text-provifood-dark">Precio</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="mt-3 space-y-3">
+                <div class="flex items-center gap-2">
+                  <input type="number" placeholder="Min" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <span class="text-gray-400">-</span>
+                  <input type="number" placeholder="Max" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                </div>
+                <button class="w-full px-4 py-2 bg-provifood-primary text-white rounded-lg text-sm font-semibold hover:bg-provifood-primary/90 transition-colors">
+                  Aplicar
+                </button>
+              </div>
+            </div>
+
+            <!-- Disponibilidad -->
+            <div class="p-4 border-b border-gray-200">
+              <button class="flex items-center justify-between w-full text-left">
+                <h3 class="font-bold text-provifood-dark">Disponibilidad</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="mt-3 space-y-2">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" class="rounded text-provifood-primary focus:ring-provifood-primary" checked />
+                  <span class="text-sm text-provifood-gray">En stock</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" class="rounded text-provifood-primary focus:ring-provifood-primary" />
+                  <span class="text-sm text-provifood-gray">Sin stock</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="p-4">
+              <button class="flex items-center justify-between w-full text-left">
+                <h3 class="font-bold text-provifood-dark">Calificación</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="mt-3 space-y-2">
+                {[5, 4, 3, 2, 1].map((stars) => (
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" class="rounded text-provifood-primary focus:ring-provifood-primary" />
+                    <div class="flex items-center">
+                      {Array.from({ length: stars }).map(() => (
+                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                      <span class="text-sm text-provifood-gray ml-2">y más</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Grid de Productos -->
+        <div class="flex-1">
+          <!-- Barra de ordenamiento -->
+          <div class="bg-white rounded-lg shadow-sm p-4 mb-6 flex items-center justify-between">
+            <p class="text-provifood-gray">
+              <span class="font-semibold text-provifood-dark">{products.length}</span> productos encontrados
+            </p>
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-provifood-gray">Ordenar por:</span>
+              <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-provifood-dark focus:ring-2 focus:ring-provifood-primary focus:border-transparent">
+                <option>Recomendados</option>
+                <option>Menor precio</option>
+                <option>Mayor precio</option>
+                <option>Más vendidos</option>
+                <option>Mejor calificados</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Grid de productos -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard product={product} />
+            ))}
+          </div>
+
+          <!-- Paginación -->
+          <div class="mt-8 flex justify-center">
+            <nav class="flex items-center gap-2">
+              <button class="px-4 py-2 border border-gray-300 rounded-lg text-provifood-dark hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {[1, 2, 3, 4, 5].map((page) => (
+                <button class={`px-4 py-2 border rounded-lg font-semibold transition-colors ${page === 1 ? 'bg-provifood-primary text-white border-provifood-primary' : 'border-gray-300 text-provifood-dark hover:bg-gray-50'}`}>
+                  {page}
+                </button>
+              ))}
+              <button class="px-4 py-2 border border-gray-300 rounded-lg text-provifood-dark hover:bg-gray-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>
