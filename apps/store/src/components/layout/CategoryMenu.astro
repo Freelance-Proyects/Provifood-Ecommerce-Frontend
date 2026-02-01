@@ -1,56 +1,95 @@
 ---
-// Menú de categorías tipo supermercado
+// Menú de categorías con desplegable tipo Jumbo
 const categories = [
-  { name: 'Harinas y Panificación', icon: 'bread', href: '/categoria/harinas' },
-  { name: 'Aceites y Grasas', icon: 'oil', href: '/categoria/aceites' },
-  { name: 'Pastas y Fideos', icon: 'pasta', href: '/categoria/pastas' },
-  { name: 'Arroz y Legumbres', icon: 'rice', href: '/categoria/arroz' },
-  { name: 'Azúcar y Endulzantes', icon: 'sugar', href: '/categoria/azucar' },
-  { name: 'Conservas', icon: 'can', href: '/categoria/conservas' },
-  { name: 'Condimentos', icon: 'spice', href: '/categoria/condimentos' },
-  { name: 'Bebidas', icon: 'drink', href: '/categoria/bebidas' },
+  { name: 'Harinas y Panificación', href: '/categoria/harinas' },
+  { name: 'Aceites y Grasas', href: '/categoria/aceites' },
+  { name: 'Pastas y Fideos', href: '/categoria/pastas' },
+  { name: 'Arroz y Legumbres', href: '/categoria/arroz' },
+  { name: 'Azúcar y Endulzantes', href: '/categoria/azucar' },
+  { name: 'Conservas', href: '/categoria/conservas' },
+  { name: 'Condimentos', href: '/categoria/condimentos' },
+  { name: 'Bebidas', href: '/categoria/bebidas' },
 ];
 ---
 
-<div class="bg-gray-50 border-t border-b border-gray-200">
+<div class="bg-stone-50" id="category-menu">
   <div class="container mx-auto px-4">
-    <div class="flex items-center overflow-x-auto scrollbar-hide py-3 space-x-1">
-      <!-- Botón de todas las categorías -->
-      <a href="/categorias" class="flex items-center space-x-2 px-4 py-2 bg-provifood-primary text-white rounded-lg hover:bg-teal-700 transition-colors whitespace-nowrap flex-shrink-0">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-        <span class="font-semibold">Todas las Categorías</span>
-      </a>
-      
-      <!-- Categorías individuales -->
-      {categories.map((category) => (
-        <a 
-          href={category.href} 
-          class="flex items-center space-x-2 px-4 py-2 text-provifood-dark hover:bg-white hover:shadow-sm rounded-lg transition-all whitespace-nowrap"
+    <div class="flex items-center justify-between py-3">
+      <!-- Botón desplegable de categorías -->
+      <div class="relative" id="categories-dropdown">
+        <button 
+          id="categories-btn"
+          class="flex items-center space-x-2 px-4 py-2 bg-provifood-secondary text-white rounded hover:bg-orange-600 transition-colors font-semibold"
         >
-          <span class="font-medium text-sm">{category.name}</span>
-        </a>
-      ))}
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span>Todas las Categorías</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        <!-- Menú desplegable -->
+        <div 
+          id="categories-menu"
+          class="hidden absolute left-0 top-full mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+        >
+          <div class="py-2">
+            {categories.map((category, index) => (
+              <a 
+                href={category.href} 
+                class="flex items-center justify-between px-5 py-3.5 text-provifood-dark hover:bg-gradient-to-r hover:from-provifood-primary/5 hover:to-teal-50 transition-all group border-b border-gray-50 last:border-b-0"
+              >
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-all">
+                    <svg class="w-5 h-5 text-provifood-primary group-hover:text-provifood-secondary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <span class="font-semibold text-sm group-hover:text-provifood-primary transition-colors">{category.name}</span>
+                </div>
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-provifood-secondary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
       
-      <!-- Ofertas destacadas -->
-      <a href="/ofertas" class="flex items-center space-x-2 px-4 py-2 bg-provifood-secondary text-white rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 ml-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-        </svg>
-        <span class="font-semibold">Ofertas</span>
-      </a>
+      <!-- Enlaces adicionales -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/nosotros" class="text-provifood-dark hover:text-provifood-primary transition-colors font-medium">
+          Sobre Nosotros
+        </a>
+        <a href="/empresas" class="text-provifood-dark hover:text-provifood-primary transition-colors font-medium">
+          Empresas y Socios
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
-<style>
-  /* Ocultar scrollbar pero mantener funcionalidad */
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+<script>
+  // Toggle del menú desplegable
+  const btn = document.getElementById('categories-btn');
+  const menu = document.getElementById('categories-menu');
+  
+  if (btn && menu) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+    
+    // Cerrar al hacer click fuera
+    document.addEventListener('click', () => {
+      menu.classList.add('hidden');
+    });
+    
+    // Prevenir que el menú se cierre al hacer click dentro
+    menu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>
+</script>
