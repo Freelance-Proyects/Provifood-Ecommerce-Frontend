@@ -11,6 +11,7 @@ export interface Product {
   category: string;
   inStock: boolean;
   quantity?: number | string; // Puede ser número o string (ej: "1kg", "500g")
+  rating?: number; // Calificación del producto (0-5)
   createdAt?: Date;
   updatedAt?: Date;
 }
