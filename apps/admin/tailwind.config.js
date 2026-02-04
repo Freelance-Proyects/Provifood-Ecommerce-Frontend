@@ -5,7 +5,16 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx,vue}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        provifood: {
+          primary: '#156F70',
+          secondary: '#F08200',
+          dark: '#333333',
+          gray: '#666666',
+        }
+      }
+    },
   },
   plugins: [],
 }
