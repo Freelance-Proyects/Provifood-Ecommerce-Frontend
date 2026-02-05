@@ -6,72 +6,21 @@ import CategoryMenu from '../components/layout/CategoryMenu.astro';
 import Footer from '../components/layout/Footer.astro';
 import Button from '../components/ui/Button.astro';
 import ProductCard from '../components/features/products/ProductCard.astro';
+import { productsApi } from '../lib/api';
 
-// Productos de ejemplo
-const featuredProducts = [
-  {
-    id: '1',
-    name: 'Harina 000 x 1kg',
-    description: 'Harina de trigo fortificada, ideal para panificación',
-    price: 450,
-    image: '',
-    inStock: true,
-    quantity: '1kg',
-    category: 'Harinas'
-  },
-  {
-    id: '2',
-    name: 'Aceite de Girasol x 1.5L',
-    description: 'Aceite de girasol alto oleico, 100% puro',
-    price: 1200,
-    discount: 15,
-    image: '',
-    inStock: true,
-    quantity: '1.5L',
-    category: 'Aceites'
-  },
-  {
-    id: '3',
-    name: 'Fideos Mostachol x 500g',
-    description: 'Pasta de sémola de trigo, cocción perfecta',
-    price: 320,
-    image: '',
-    inStock: true,
-    quantity: '500g',
-    category: 'Pastas'
-  },
-  {
-    id: '4',
-    name: 'Arroz Largo Fino x 1kg',
-    description: 'Arroz grano largo, ideal para todo tipo de comidas',
-    price: 580,
-    image: '',
-    inStock: false,
-    quantity: '1kg',
-    category: 'Arroz'
-  },
-  {
-    id: '5',
-    name: 'Azúcar Blanca x 1kg',
-    description: 'Azúcar refinada tipo A, máxima pureza',
-    price: 420,
-    image: '',
-    inStock: true,
-    quantity: '1kg',
-    category: 'Azúcar'
-  },
-  {
-    id: '6',
-    name: 'Conserva de Tomate x 500g',
-    description: 'Tomate perita en cubos, sin conservantes',
-    price: 280,
-    discount: 10,
-    image: '',
-    inStock: true,
-    quantity: '500g',
-    category: 'Conservas'
-  },
-];
+// Cargar productos desde la API
+const allProducts = await productsApi.getAll({ limit: 12 });
+
+// Convertir a formato compatible con ProductCard
+const featuredProducts = allProducts.map(product => ({
+  id: product.id.toString(),
+  name: product.name,
+  description: product.description || '',
+  price: product.price,
+  image: product.image_url || '',
+  inStock: product.stock > 0,
+  category: product.category || 'Sin categoría'
+}));
 ---
 
 <Layout title="Provifood - Distribuidora de Alimentos al Por Mayor y Menor">

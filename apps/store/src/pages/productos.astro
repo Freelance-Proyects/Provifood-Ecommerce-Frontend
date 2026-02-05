@@ -5,17 +5,20 @@ import Navbar from '../components/layout/Navbar.astro';
 import CategoryMenu from '../components/layout/CategoryMenu.astro';
 import Footer from '../components/layout/Footer.astro';
 import ProductCard from '../components/features/products/ProductCard.astro';
+import { productsApi } from '../lib/api';
 
-// Productos de ejemplo - En producción vendrían del backend
-const products = Array.from({ length: 24 }, (_, i) => ({
-  id: `${i + 1}`,
-  name: `Producto ${i + 1}`,
-  price: Math.floor(Math.random() * 5000) + 1000,
-  discount: i % 3 === 0 ? 15 : 0,
-  image: '',
-  inStock: i % 7 !== 0,
-  category: ['Frutas', 'Verduras', 'Lácteos', 'Carnes', 'Bebidas', 'Despensa'][Math.floor(Math.random() * 6)],
-  rating: 3.5 + Math.random() * 1.5
+// Cargar todos los productos desde la API
+const allProducts = await productsApi.getAll({ limit: 100 });
+
+// Convertir a formato compatible con ProductCard
+const products = allProducts.map(product => ({
+  id: product.id.toString(),
+  name: product.name,
+  description: product.description || '',
+  price: product.price,
+  image: product.image_url || '',
+  inStock: product.stock > 0,
+  category: product.category || 'Sin categoría'
 }));
 ---
 

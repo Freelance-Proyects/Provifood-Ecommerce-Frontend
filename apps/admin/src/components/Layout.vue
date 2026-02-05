@@ -6,7 +6,6 @@
       <div class="p-6 border-b-2 border-gray-200">
         <div class="flex flex-col items-center gap-2">
           <img src="/logo.png" alt="Provifood" class="h-16 w-auto" />
-          <p class="text-xs font-semibold text-gray-600">Panel Admin</p>
         </div>
       </div>
 
