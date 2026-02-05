@@ -8,7 +8,7 @@ export default defineConfig({
     vue(),
     tailwind(),
   ],
-  output: 'hybrid',
+  output: 'static',
   vite: {
     resolve: {
       alias: {
