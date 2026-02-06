@@ -19,7 +19,8 @@ const featuredProducts = allProducts.map(product => ({
   price: product.price,
   image: product.image_url || '',
   inStock: product.stock > 0,
-  category: product.category || 'Sin categoría'
+  category: product.category || 'Sin categoría',
+  brand: product.brand || ''
 }));
 ---
 

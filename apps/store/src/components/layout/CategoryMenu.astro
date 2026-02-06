@@ -72,24 +72,37 @@ const categories = [
 </div>
 
 <script>
-  // Toggle del menú desplegable
-  const btn = document.getElementById('categories-btn');
-  const menu = document.getElementById('categories-menu');
-  
-  if (btn && menu) {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('hidden');
-    });
+  function initCategoryMenu() {
+    const btn = document.getElementById('categories-btn');
+    const menu = document.getElementById('categories-menu');
     
-    // Cerrar al hacer click fuera
-    document.addEventListener('click', () => {
-      menu.classList.add('hidden');
-    });
-    
-    // Prevenir que el menú se cierre al hacer click dentro
-    menu.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
+    if (btn && menu) {
+      // Remover listeners previos si existen
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode?.replaceChild(newBtn, btn);
+      
+      newBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      });
+      
+      // Cerrar al hacer click fuera
+      const closeMenu = () => {
+        menu.classList.add('hidden');
+      };
+      
+      document.addEventListener('click', closeMenu);
+      
+      // Prevenir que el menú se cierre al hacer click dentro
+      menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
   }
+  
+  // Ejecutar al cargar la página
+  initCategoryMenu();
+  
+  // Ejecutar después de cada navegación con View Transitions
+  document.addEventListener('astro:page-load', initCategoryMenu);
 </script>

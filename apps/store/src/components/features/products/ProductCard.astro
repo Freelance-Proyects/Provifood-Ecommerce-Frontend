@@ -13,7 +13,9 @@ const {
     price: 0,
     image: '',
     inStock: true,
-    category: 'Categoría'
+    category: 'Categoría',
+    brand: '',
+    discount: 0
   },
   showWholesalePrice = false 
 } = Astro.props;
@@ -21,23 +23,17 @@ const {
 const regularPrice = product.price || 0;
 const discount = product.discount || 0;
 const discountedPrice = discount > 0 ? regularPrice * (1 - discount / 100) : regularPrice;
-const rating = (product as Product).rating || 4.5;
 ---
 
 <div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300 group relative">
-  <!-- Botón favorito -->
-  <button class="absolute top-3 right-3 z-10 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-    <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-    </svg>
-  </button>
-
   <!-- Imagen del producto -->
   <div class="relative bg-white h-56 overflow-hidden flex items-center justify-center p-6">
     {product.image ? (
       <img 
         src={product.image} 
-        alt={product.name} 
+        alt={product.name}
+        loading="lazy"
+        decoding="async"
         class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
       />
     ) : (
@@ -57,45 +53,39 @@ const rating = (product as Product).rating || 4.5;
   
   <!-- Información del producto -->
   <div class="p-4">
-    <!-- Precio principal -->
-    <div class="mb-2">
+    <!-- Marca (opacidad baja) -->
+    {product.brand && (
+      <p class="text-xs text-gray-400 mb-1 uppercase tracking-wide">
+        {product.brand}
+      </p>
+    )}
+    
+    <!-- Nombre del producto (Texto Principal) -->
+    <h3 class="text-base font-semibold text-provifood-dark mb-3 line-clamp-2 min-h-[3rem]">
+      {product.name}
+    </h3>
+    
+    <!-- Precio (tamaño notable) -->
+    <div class="mb-4">
       <div class="flex items-baseline gap-2">
-        <span class="text-3xl font-bold text-provifood-dark">
+        <span class="text-2xl font-bold text-provifood-primary">
           ${discountedPrice.toLocaleString('es-CL')}
         </span>
         {discount > 0 && (
-          <span class="text-lg text-gray-400 line-through">
+          <span class="text-base text-gray-400 line-through">
             ${regularPrice.toLocaleString('es-CL')}
           </span>
         )}
       </div>
     </div>
-
-    <!-- Categoría -->
-    <p class="text-sm text-provifood-gray mb-2">
-      {product.category}
-    </p>
-    
-    <!-- Nombre del producto -->
-    <h3 class="text-base text-provifood-dark mb-3 line-clamp-2 min-h-[3rem]">
-      {product.name}
-    </h3>
     
     <!-- Botón de agregar -->
     <button 
-      class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
       disabled={!product.inStock}
     >
-      {product.inStock ? 'Agregar' : 'Sin Stock'}
+      {product.inStock ? 'Agregar al Carrito' : 'Sin Stock'}
     </button>
-
-    <!-- Rating -->
-    <div class="flex items-center gap-1 mt-3">
-      <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-      <span class="text-provifood-dark font-semibold">{rating.toFixed(1)}</span>
-    </div>
   </div>
 </div>
 

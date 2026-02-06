@@ -1,5 +1,6 @@
 ---
 import type { AstroGlobal } from 'astro';
+import { ViewTransitions } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -16,12 +17,27 @@ const { title = 'Provifood - Tu tienda de alimentos' } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/navlogo.png" />
     
-    <!-- Google Fonts - Open Sans -->
+    <!-- Preconnect para recursos externos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://provifood-ecommerce-backend.onrender.com">
+    
+    <!-- DNS Prefetch para imágenes de Supabase -->
+    <link rel="dns-prefetch" href="https://kbvyzltxxnxszrsoymdi.supabase.co">
+    
+    <!-- Google Fonts - Open Sans con display=swap para evitar FOIT -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- View Transitions API con animación rápida -->
+    <ViewTransitions fallback="none" />
+    
     <title>{title}</title>
+    
+    <style is:global>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
   </head>
   <body class="bg-white font-sans text-provifood-dark m-0 p-0">
     <slot />
