@@ -7,34 +7,32 @@ interface Props {
   showWholesalePrice?: boolean;
 }
 
-const { 
+const {
   product = {
     name: 'Nombre del Producto',
     price: 0,
-    image: '',
-    inStock: true,
+    image_url: '',
+    stock: 0,
     category: 'Categoría',
-    brand: '',
-    discount: 0
+    brand: ''
   },
-  showWholesalePrice = false 
+  showWholesalePrice = false
 } = Astro.props;
 
-const regularPrice = product.price || 0;
-const discount = product.discount || 0;
-const discountedPrice = discount > 0 ? regularPrice * (1 - discount / 100) : regularPrice;
+const price = product.price || 0;
+const isInStock = (product.stock ?? 0) > 0;
 ---
 
-<div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300 group relative">
+<div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl group relative">
   <!-- Imagen del producto -->
   <div class="relative bg-white h-56 overflow-hidden flex items-center justify-center p-6">
-    {product.image ? (
-      <img 
-        src={product.image} 
+    {product.image_url ? (
+      <img
+        src={product.image_url}
         alt={product.name}
         loading="lazy"
         decoding="async"
-        class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
+        class="max-w-full max-h-full object-contain"
       />
     ) : (
       <div class="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
@@ -43,8 +41,8 @@ const discountedPrice = discount > 0 ? regularPrice * (1 - discount / 100) : reg
         </svg>
       </div>
     )}
-    
-    {!product.inStock && (
+
+    {!isInStock && (
       <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
         <span class="text-white text-lg font-bold">Agotado</span>
       </div>
@@ -69,22 +67,17 @@ const discountedPrice = discount > 0 ? regularPrice * (1 - discount / 100) : reg
     <div class="mb-4">
       <div class="flex items-baseline gap-2">
         <span class="text-2xl font-bold text-provifood-primary">
-          ${discountedPrice.toLocaleString('es-CL')}
+          ${price.toLocaleString('es-CL')}
         </span>
-        {discount > 0 && (
-          <span class="text-base text-gray-400 line-through">
-            ${regularPrice.toLocaleString('es-CL')}
-          </span>
-        )}
       </div>
     </div>
-    
+
     <!-- Botón de agregar -->
-    <button 
-      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-      disabled={!product.inStock}
+    <button
+      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+      disabled={!isInStock}
     >
-      {product.inStock ? 'Agregar al Carrito' : 'Sin Stock'}
+      {isInStock ? 'Agregar al Carrito' : 'Sin Stock'}
     </button>
   </div>
 </div>

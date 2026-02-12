@@ -2,7 +2,7 @@
 
 Monorepo con **pnpm workspaces** para el proyecto Provifood E-commerce (B2C y B2B).
 
-## Arquitectura del Proyecto
+## 🏗️ Arquitectura del Proyecto
 
 ```
 Provifood-Ecommerce-Frontend/
@@ -13,7 +13,7 @@ Provifood-Ecommerce-Frontend/
     └── types/          # Tipos TypeScript compartidos
 ```
 
-## Stack Tecnológico
+## 🚀 Stack Tecnológico
 
 ### Store (Frontend Público)
 - **Astro** v4.16.19 - SSG/SSR híbrido
@@ -26,8 +26,130 @@ Provifood-Ecommerce-Frontend/
 - **Vite** - Build tool
 - **Pinia** - State management
 - **Vue Router** - Routing
-- **TanStack Query** - Data fetching
+- **TanStack Query** v5.17 - Data fetching y caching
+- **Axios** - HTTP client
+- **Zod** - Validación de formularios
 - **TailwindCSS** - Estilos
+
+## ✨ Mejoras Arquitectónicas Recientes
+
+### Refactorización Completa del Admin Panel
+
+1. **✅ Tipos TypeScript Unificados**
+   - Source of truth en `@provifood/types`
+   - Eliminación de duplicación de interfaces
+   - Type safety completo en toda la aplicación
+
+2. **✅ Variables de Entorno**
+   - Configuración externalizada
+   - Archivos `.env.example` y `.env.local`
+   - Support para múltiples ambientes
+
+3. **✅ Repository Pattern**
+   - Abstracción de la capa de API
+   - HTTP client centralizado con Axios
+   - Interceptors para manejo de errores
+   - Código testeable y mantenible
+
+4. **✅ Sistema de Toast Notifications**
+   - Notificaciones elegantes y no intrusivas
+   - Store de Pinia para gestión de estado
+   - Animaciones suaves con CSS transitions
+
+5. **✅ TanStack Query Integration**
+   - Cache inteligente de datos
+   - Revalidación automática
+   - Optimistic updates
+   - Loading y error states automáticos
+
+6. **✅ Composables Reutilizables**
+   - `useProducts` - Data fetching con queries
+   - `useProductMutations` - Create, Update, Delete
+   - `useProductFilters` - Lógica de filtrado
+   - `useProductPagination` - Paginación genérica
+   - `useFormValidation` - Validación con Zod
+
+7. **✅ Validación con Zod**
+   - Type-safe validation schemas
+   - Mensajes de error personalizados
+   - Integración con formularios
+
+8. **✅ Sistema de Componentes UI**
+   - `Modal` - Con focus trap y Escape key
+   - `Button` - Variantes y estados de loading
+   - `Input`, `Select`, `Textarea` - Con validación
+   - `LoadingSpinner` y `SkeletonLoader`
+   - `Toast` - Notificaciones
+
+9. **✅ Componentes de Productos Modulares**
+   - `ProductsHeader` - Título y acciones
+   - `ProductStats` - Tarjetas de estadísticas
+   - `ProductFilters` - Filtros y búsqueda
+   - `ProductTable` - Tabla con paginación
+   - `ProductFormModal` - Formulario create/edit
+
+10. **✅ Refactorización de Products.vue**
+    - **Antes**: 614 líneas monolíticas
+    - **Después**: 90 líneas limpias
+    - Separación de concerns
+    - Código altamente mantenible
+
+## 📁 Estructura Mejorada (Admin)
+
+```
+apps/admin/src/
+├── components/
+│   ├── ui/                    # Componentes UI base
+│   │   ├── Modal.vue
+│   │   ├── Button.vue
+│   │   ├── Input.vue
+│   │   ├── Select.vue
+│   │   ├── Textarea.vue
+│   │   ├── LoadingSpinner.vue
+│   │   ├── SkeletonLoader.vue
+│   │   └── Toast.vue
+│   └── products/              # Componentes de productos
+│       ├── ProductsHeader.vue
+│       ├── ProductStats.vue
+│       ├── ProductFilters.vue
+│       ├── ProductTable.vue
+│       └── ProductFormModal.vue
+├── composables/
+│   ├── queries/               # TanStack Query composables
+│   │   ├── useProducts.ts
+│   │   ├── useProductMutations.ts
+│   │   └── useProductStats.ts
+│   ├── useProductFilters.ts   # Lógica de filtrado
+│   ├── useProductPagination.ts # Paginación genérica
+│   ├── useFormValidation.ts   # Validación Zod
+│   └── useToast.ts            # Toast notifications
+├── lib/
+│   ├── http/                  # HTTP client
+│   │   ├── client.ts
+│   │   └── interceptors.ts
+│   ├── repositories/          # Repository pattern
+│   │   ├── products.repository.ts
+│   │   └── index.ts
+│   ├── query/                 # TanStack Query config
+│   │   ├── client.ts
+│   │   └── keys.ts
+│   ├── validation/            # Validation schemas
+│   │   └── schemas/
+│   │       └── product.schema.ts
+│   └── constants/             # Constantes compartidas
+│       ├── categories.ts
+│       └── index.ts
+├── stores/                    # Pinia stores
+│   ├── app.ts
+│   ├── products.ts
+│   └── toast.ts
+├── views/                     # Páginas principales
+│   ├── Home.vue
+│   ├── Orders.vue
+│   └── Products.vue (90 líneas)
+└── router/                    # Vue Router config
+    └── index.ts
+```
 
 ### Shared Packages
 - **@provifood/types** - Interfaces TypeScript compartidas

@@ -52,31 +52,31 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
     <section class="bg-white border-b border-gray-200 py-6">
       <div class="container mx-auto px-4">
         <div class="flex items-center gap-4 overflow-x-auto pb-2">
-          <button class="px-6 py-2 bg-provifood-primary text-white rounded-full font-semibold whitespace-nowrap hover:bg-provifood-primary/90 transition-colors">
+          <button class="px-6 py-2 bg-provifood-primary text-white rounded-full font-semibold whitespace-nowrap hover:bg-provifood-primary/90">
             Todos
           </button>
-          <a href="/categoria/frutas-verduras" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/frutas-verduras" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Frutas y Verduras
           </a>
-          <a href="/categoria/carnes-pescados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/carnes-pescados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Carnes y Pescados
           </a>
-          <a href="/categoria/lacteos" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/lacteos" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Lácteos
           </a>
-          <a href="/categoria/panaderia" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/panaderia" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Panadería
           </a>
-          <a href="/categoria/bebidas" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/bebidas" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Bebidas
           </a>
-          <a href="/categoria/despensa" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/despensa" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Despensa
           </a>
-          <a href="/categoria/congelados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/congelados" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Congelados
           </a>
-          <a href="/categoria/limpieza" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors">
+          <a href="/categoria/limpieza" class="px-6 py-2 bg-gray-100 text-provifood-dark rounded-full font-semibold whitespace-nowrap hover:bg-gray-200">
             Limpieza
           </a>
         </div>
@@ -148,7 +148,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
                   <span class="text-gray-400">-</span>
                   <input type="number" id="price-max" placeholder="Max" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
                 </div>
-                <button id="apply-price" class="w-full px-4 py-2 bg-provifood-primary text-white rounded-lg text-sm font-semibold hover:bg-provifood-primary/90 transition-colors">
+                <button id="apply-price" class="w-full px-4 py-2 bg-provifood-primary text-white rounded-lg text-sm font-semibold hover:bg-provifood-primary/90">
                   Aplicar
                 </button>
               </div>
@@ -176,7 +176,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
 
             <!-- Botón Aplicar Filtros -->
             <div class="p-4">
-              <button id="apply-filters" class="w-full px-4 py-3 bg-provifood-primary text-white rounded-lg font-bold hover:bg-provifood-primary/90 transition-colors shadow-md">
+              <button id="apply-filters" class="w-full px-4 py-3 bg-provifood-primary text-white rounded-lg font-bold hover:bg-provifood-primary/90 shadow-md">
                 Aplicar Filtros
               </button>
             </div>
@@ -226,7 +226,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
                   </svg>
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button class={`px-4 py-2 border rounded-lg font-semibold transition-colors ${page === currentPage ? 'bg-provifood-primary text-white border-provifood-primary' : 'border-gray-300 text-provifood-dark hover:bg-gray-50'}`}>
+                  <button class={`px-4 py-2 border rounded-lg font-semibold ${page === currentPage ? 'bg-provifood-primary text-white border-provifood-primary' : 'border-gray-300 text-provifood-dark hover:bg-gray-50'}`}>
                     {page}
                   </button>
                 ))}

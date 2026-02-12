@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://provifood-ecommerce-backend.onrender.com/api/v1'
+import type { Product, ProductFilters } from '@provifood/types'
+
+const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL
 
 // Cache simple para reducir llamadas a la API
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -16,25 +18,8 @@ function setCachedData(key: string, data: any) {
   cache.set(key, { data, timestamp: Date.now() })
 }
 
-export interface Product {
-  id: number
-  sku: string
-  name: string
-  description: string
-  price: number
-  category: string
-  brand?: string
-  stock: number
-  image_url?: string
-}
-
 export const productsApi = {
-  async getAll(params?: {
-    skip?: number
-    limit?: number
-    category?: string
-    search?: string
-  }): Promise<Product[]> {
+  async getAll(params?: ProductFilters): Promise<Product[]> {
     const queryParams = new URLSearchParams()
     if (params?.skip !== undefined) queryParams.append('skip', params.skip.toString())
     if (params?.limit !== undefined) queryParams.append('limit', params.limit.toString())

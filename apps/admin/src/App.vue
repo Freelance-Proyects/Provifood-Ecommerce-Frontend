@@ -1,9 +1,8 @@
 <template>
   <router-view />
-  
+  <Toast />
 </template>
 
 <script setup lang="ts">
-
-// App initialization
+import Toast from './components/ui/Toast.vue'
 </script>

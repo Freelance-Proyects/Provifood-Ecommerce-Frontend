@@ -1,6 +1,5 @@
 ---
 import type { AstroGlobal } from 'astro';
-import { ViewTransitions } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -27,17 +26,8 @@ const { title = 'Provifood - Tu tienda de alimentos' } = Astro.props;
     
     <!-- Google Fonts - Open Sans con display=swap para evitar FOIT -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- View Transitions API con animación rápida -->
-    <ViewTransitions fallback="none" />
-    
+
     <title>{title}</title>
-    
-    <style is:global>
-      @view-transition {
-        navigation: auto;
-      }
-    </style>
   </head>
   <body class="bg-white font-sans text-provifood-dark m-0 p-0">
     <slot />

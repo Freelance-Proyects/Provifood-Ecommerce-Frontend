@@ -2,18 +2,37 @@
 // Product Types
 // ============================================
 export interface Product {
-  id: string;
+  id: number;
+  sku: string;
   name: string;
   description: string;
   price: number;
-  discount?: number;
-  image: string;
   category: string;
-  brand?: string;
-  inStock: boolean;
-  quantity?: number | string; // Puede ser número o string (ej: "1kg", "500g")
-  createdAt?: Date;
-  updatedAt?: Date;
+  brand: string | null;
+  stock: number;
+  image_url: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductStats {
+  total: number;
+  in_stock: number;
+  low_stock: number;
+  out_of_stock: number;
+}
+
+export interface ProductFilters {
+  skip?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+}
+
+export interface ApiError {
+  message: string;
+  code?: string;
+  details?: unknown;
 }
 
 // ============================================

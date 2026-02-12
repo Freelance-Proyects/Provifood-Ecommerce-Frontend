@@ -17,9 +17,9 @@ const categories = [
     <div class="flex items-center justify-between py-3">
       <!-- Botón desplegable de categorías -->
       <div class="relative" id="categories-dropdown">
-        <button 
+        <button
           id="categories-btn"
-          class="flex items-center space-x-2 px-4 py-2 bg-provifood-secondary text-white rounded hover:bg-orange-600 transition-colors font-semibold"
+          class="flex items-center space-x-2 px-4 py-2 bg-provifood-secondary text-white rounded hover:bg-orange-600 font-semibold"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -37,19 +37,19 @@ const categories = [
         >
           <div class="py-2">
             {categories.map((category, index) => (
-              <a 
-                href={category.href} 
-                class="flex items-center justify-between px-5 py-3.5 text-provifood-dark hover:bg-gradient-to-r hover:from-provifood-primary/5 hover:to-teal-50 transition-all group border-b border-gray-50 last:border-b-0"
+              <a
+                href={category.href}
+                class="flex items-center justify-between px-5 py-3.5 text-provifood-dark hover:bg-gradient-to-r hover:from-provifood-primary/5 hover:to-teal-50 group border-b border-gray-50 last:border-b-0"
               >
                 <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 flex items-center justify-center group-hover:scale-110 transition-all">
-                    <svg class="w-5 h-5 text-provifood-primary group-hover:text-provifood-secondary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-8 h-8 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-provifood-primary group-hover:text-provifood-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                   </div>
-                  <span class="font-semibold text-sm group-hover:text-provifood-primary transition-colors">{category.name}</span>
+                  <span class="font-semibold text-sm group-hover:text-provifood-primary">{category.name}</span>
                 </div>
-                <svg class="w-5 h-5 text-gray-300 group-hover:text-provifood-secondary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-provifood-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </a>
@@ -60,10 +60,10 @@ const categories = [
       
       <!-- Enlaces adicionales -->
       <div class="hidden md:flex items-center space-x-6">
-        <a href="https://provifood.cl/" target="_blank" rel="noopener noreferrer" class="text-provifood-dark hover:text-provifood-primary transition-colors font-medium">
+        <a href="https://provifood.cl/" target="_blank" rel="noopener noreferrer" class="text-provifood-dark hover:text-provifood-primary font-medium">
           Sobre Nosotros
         </a>
-        <a href="/empresas" class="text-provifood-dark hover:text-provifood-primary transition-colors font-medium">
+        <a href="/empresas" class="text-provifood-dark hover:text-provifood-primary font-medium">
           Empresas y Socios
         </a>
       </div>
