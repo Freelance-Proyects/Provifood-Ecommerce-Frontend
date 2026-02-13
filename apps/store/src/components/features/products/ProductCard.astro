@@ -23,9 +23,9 @@ const price = product.price || 0;
 const isInStock = (product.stock ?? 0) > 0;
 ---
 
-<div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl group relative">
+<div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow group relative h-full flex flex-col">
   <!-- Imagen del producto -->
-  <div class="relative bg-white h-56 overflow-hidden flex items-center justify-center p-6">
+  <div class="relative bg-white h-48 md:h-56 overflow-hidden flex items-center justify-center p-4 md:p-6">
     {product.image_url ? (
       <img
         src={product.image_url}
@@ -36,7 +36,7 @@ const isInStock = (product.stock ?? 0) > 0;
       />
     ) : (
       <div class="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
-        <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-20 h-20 md:w-24 md:h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       </div>
@@ -44,29 +44,29 @@ const isInStock = (product.stock ?? 0) > 0;
 
     {!isInStock && (
       <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-        <span class="text-white text-lg font-bold">Agotado</span>
+        <span class="text-white text-base md:text-lg font-bold">Agotado</span>
       </div>
     )}
   </div>
-  
+
   <!-- Información del producto -->
-  <div class="p-4">
+  <div class="p-3 md:p-4 flex-1 flex flex-col">
     <!-- Marca (opacidad baja) -->
     {product.brand && (
       <p class="text-xs text-gray-400 mb-1 uppercase tracking-wide">
         {product.brand}
       </p>
     )}
-    
+
     <!-- Nombre del producto (Texto Principal) -->
-    <h3 class="text-base font-semibold text-provifood-dark mb-3 line-clamp-2 min-h-[3rem]">
+    <h3 class="text-sm md:text-base font-semibold text-provifood-dark mb-2 md:mb-3 line-clamp-2 flex-1">
       {product.name}
     </h3>
-    
+
     <!-- Precio (tamaño notable) -->
-    <div class="mb-4">
+    <div class="mb-3 md:mb-4">
       <div class="flex items-baseline gap-2">
-        <span class="text-2xl font-bold text-provifood-primary">
+        <span class="text-xl md:text-2xl font-bold text-provifood-primary">
           ${price.toLocaleString('es-CL')}
         </span>
       </div>
@@ -74,7 +74,7 @@ const isInStock = (product.stock ?? 0) > 0;
 
     <!-- Botón de agregar -->
     <button
-      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-2.5 md:py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm md:text-base"
       disabled={!isInStock}
     >
       {isInStock ? 'Agregar al Carrito' : 'Sin Stock'}

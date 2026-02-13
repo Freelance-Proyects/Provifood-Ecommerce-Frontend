@@ -12,11 +12,12 @@ const allProducts = await productsApi.getAll({ limit: 100 });
 
 // Convertir a formato compatible con ProductCard
 const products = allProducts.map(product => ({
-  id: product.id.toString(),
+  id: product.id,
   name: product.name,
   description: product.description || '',
   price: product.price,
-  image: product.image_url || '',
+  image_url: product.image_url || '',
+  stock: product.stock,
   inStock: product.stock > 0,
   category: product.category || 'Sin categoría',
   brand: product.brand || ''

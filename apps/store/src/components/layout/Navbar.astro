@@ -4,18 +4,18 @@
 
 <nav class="bg-white shadow-sm sticky top-0 z-50">
   <div class="container mx-auto px-4">
-    <div class="flex items-center justify-between py-4 gap-4">
+    <div class="flex items-center justify-between py-3 md:py-4 gap-2 md:gap-4">
       <!-- Logo -->
       <a href="/" class="flex items-center space-x-2 flex-shrink-0">
-        <img src="/logo.png" alt="Provifood" class="h-16 w-auto" />
+        <img src="/logo.png" alt="Provifood" class="h-12 md:h-16 w-auto" />
       </a>
-      
+
       <!-- Buscador -->
       <div class="hidden md:flex flex-1 max-w-2xl">
         <div class="relative w-full">
-          <input 
-            type="search" 
-            placeholder="Buscar productos, marcas..." 
+          <input
+            type="search"
+            placeholder="Buscar productos, marcas..."
             class="w-full px-4 py-2 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none"
           />
           <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-1.5 rounded">
@@ -25,9 +25,9 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Acciones de usuario -->
-      <div class="flex items-center space-x-2 flex-shrink-0">
+      <div class="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
         <!-- Carrito -->
         <a href="/carrito" class="relative p-2 hover:bg-gray-100 rounded-lg group">
           <svg class="w-6 h-6 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,16 +36,134 @@
           <span class="absolute -top-1 -right-1 bg-provifood-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
           <span class="hidden md:inline absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Mi Carrito</span>
         </a>
-        
-        <!-- Menú móvil -->
-        <button class="md:hidden p-2 hover:bg-gray-100 rounded-lg">
-          <svg class="w-6 h-6 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+        <!-- Botón menú móvil -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <svg id="menu-icon" class="w-6 h-6 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 text-provifood-primary hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
     </div>
   </div>
-  
-  <!-- Barra de categorías -->
+
+  <!-- Menú desplegable móvil -->
+  <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200">
+    <div class="container mx-auto px-4 py-4">
+      <!-- Buscador móvil -->
+      <div class="mb-4">
+        <div class="relative">
+          <input
+            type="search"
+            placeholder="Buscar productos..."
+            class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none text-base"
+          />
+          <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-2 rounded">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Enlaces de navegación -->
+      <div class="space-y-1">
+        <a href="/" class="flex items-center px-4 py-3 text-provifood-dark hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <svg class="w-5 h-5 mr-3 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Inicio
+        </a>
+
+        <a href="/productos" class="flex items-center px-4 py-3 text-provifood-dark hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <svg class="w-5 h-5 mr-3 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          Productos
+        </a>
+
+        <a href="/categorias" class="flex items-center px-4 py-3 text-provifood-dark hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <svg class="w-5 h-5 mr-3 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+          Categorías
+        </a>
+
+        <a href="/ofertas" class="flex items-center px-4 py-3 text-provifood-dark hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <svg class="w-5 h-5 mr-3 text-provifood-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          Ofertas
+        </a>
+
+        <a href="/contacto" class="flex items-center px-4 py-3 text-provifood-dark hover:bg-gray-50 rounded-lg font-medium transition-colors">
+          <svg class="w-5 h-5 mr-3 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Contacto
+        </a>
+      </div>
+
+      <!-- Botón CTA -->
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <a href="/contacto" class="flex items-center justify-center w-full px-4 py-3 bg-provifood-secondary text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          Solicitar Presupuesto
+        </a>
+      </div>
+    </div>
+  </div>
 </nav>
+
+<script>
+  // Script para manejar el menú móvil
+  function setupMobileMenu() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    if (!menuBtn || !mobileMenu || !menuIcon || !closeIcon) return;
+
+    // Toggle del menú
+    menuBtn.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+
+      if (isOpen) {
+        // Cerrar
+        mobileMenu.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        document.body.style.overflow = '';
+      } else {
+        // Abrir
+        mobileMenu.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+
+    // Cerrar al hacer click en un enlace
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  // Inicializar al cargar la página
+  document.addEventListener('DOMContentLoaded', setupMobileMenu);
+
+  // Reinicializar en transiciones de Astro
+  document.addEventListener('astro:page-load', setupMobileMenu);
+</script>
