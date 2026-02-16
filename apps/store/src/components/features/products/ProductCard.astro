@@ -23,7 +23,7 @@ const price = product.price || 0;
 const isInStock = (product.stock ?? 0) > 0;
 ---
 
-<div class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow group relative h-full flex flex-col">
+<a href={`/producto/${product.id}`} class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow group relative h-full flex flex-col">
   <!-- Imagen del producto -->
   <div class="relative bg-white h-48 md:h-56 overflow-hidden flex items-center justify-center p-4 md:p-6">
     {product.image_url ? (
@@ -74,13 +74,22 @@ const isInStock = (product.stock ?? 0) > 0;
 
     <!-- Botón de agregar -->
     <button
-      class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-2.5 md:py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm md:text-base"
+      class="add-to-cart-btn w-full bg-provifood-secondary hover:bg-orange-600 text-white font-semibold py-2.5 md:py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm md:text-base"
       disabled={!isInStock}
+      onclick="event.preventDefault(); event.stopPropagation();"
+      data-product-id={product.id}
+      data-product-sku={product.sku}
+      data-product-name={product.name}
+      data-product-price={price}
+      data-product-image={product.image_url}
+      data-product-category={product.category}
+      data-product-brand={product.brand}
+      data-stock={product.stock || 0}
     >
       {isInStock ? 'Agregar al Carrito' : 'Sin Stock'}
     </button>
   </div>
-</div>
+</a>
 
 <style>
   .line-clamp-2 {
@@ -90,3 +99,54 @@ const isInStock = (product.stock ?? 0) > 0;
     overflow: hidden;
   }
 </style>
+
+<script>
+  import { addToCart, getQuantityInCart } from '@/stores/cart'
+  import type { Product } from '@provifood/types'
+
+  // Agregar al carrito usando Nanostores
+  function setupProductCards() {
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const button = e.currentTarget as HTMLElement;
+
+        const product: Product = {
+          id: parseInt(button.dataset.productId!),
+          sku: button.dataset.productSku || '',
+          name: button.dataset.productName!,
+          description: '',
+          price: parseFloat(button.dataset.productPrice || '0'),
+          category: button.dataset.productCategory || '',
+          brand: button.dataset.productBrand || null,
+          stock: parseInt(button.dataset.stock || '0'),
+          image_url: button.dataset.productImage || null,
+        };
+
+        // Intentar agregar al carrito
+        const success = addToCart(product, 1);
+
+        if (success) {
+          // Mostrar confirmación
+          const quantityInCart = getQuantityInCart(product.id);
+          const units = quantityInCart > 1 ? 'es' : '';
+          alert(`✅ ${product.name} agregado al carrito\n\nTienes ${quantityInCart} unidad${units} en tu carrito.`);
+        } else {
+          // Mostrar error (el store ya da warnings en consola)
+          const quantityInCart = getQuantityInCart(product.id);
+          if (quantityInCart > 0) {
+            alert(`⚠️ Stock insuficiente\n\nSolo hay ${product.stock} unidades disponibles de ${product.name}.\nYa tienes ${quantityInCart} en tu carrito.`);
+          } else {
+            alert(`⚠️ Producto sin stock\n\n${product.name} no está disponible en este momento.`);
+          }
+        }
+      });
+    });
+  }
+
+  // Inicializar al cargar
+  document.addEventListener('DOMContentLoaded', setupProductCards);
+  document.addEventListener('astro:page-load', setupProductCards);
+</script>

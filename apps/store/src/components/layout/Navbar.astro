@@ -14,15 +14,21 @@
       <div class="hidden md:flex flex-1 max-w-2xl">
         <div class="relative w-full">
           <input
+            id="search-input-desktop"
             type="search"
             placeholder="Buscar productos, marcas..."
             class="w-full px-4 py-2 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none"
+            autocomplete="off"
           />
-          <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-1.5 rounded">
+          <button id="search-button-desktop" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-1.5 rounded">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
+          <!-- Dropdown de autocompletado -->
+          <div id="search-results-desktop" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border-2 border-gray-200 max-h-96 overflow-y-auto z-50">
+            <!-- Los resultados se insertarán aquí dinámicamente -->
+          </div>
         </div>
       </div>
 
@@ -33,7 +39,7 @@
           <svg class="w-6 h-6 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <span class="absolute -top-1 -right-1 bg-provifood-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-provifood-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">0</span>
           <span class="hidden md:inline absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Mi Carrito</span>
         </a>
 
@@ -57,15 +63,21 @@
       <div class="mb-4">
         <div class="relative">
           <input
+            id="search-input-mobile"
             type="search"
             placeholder="Buscar productos..."
             class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none text-base"
+            autocomplete="off"
           />
-          <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-2 rounded">
+          <button id="search-button-mobile" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-2 rounded">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
+          <!-- Dropdown de autocompletado móvil -->
+          <div id="search-results-mobile" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border-2 border-gray-200 max-h-80 overflow-y-auto z-50">
+            <!-- Los resultados se insertarán aquí dinámicamente -->
+          </div>
         </div>
       </div>
 
@@ -161,9 +173,222 @@
     });
   }
 
+  // Actualizar contador del carrito usando Nanostores
+  import { $cart, $cartCount } from '@/stores/cart';
+
+  // Variable para almacenar la desuscripción
+  let unsubscribeCart = null;
+
+  function updateCartCount() {
+    const cartCountElement = document.getElementById('cart-count');
+    if (!cartCountElement) return;
+
+    try {
+      const totalItems = $cartCount.get();
+
+      if (totalItems > 0) {
+        cartCountElement.textContent = totalItems > 99 ? '99+' : String(totalItems);
+        cartCountElement.classList.remove('hidden');
+      } else {
+        cartCountElement.classList.add('hidden');
+      }
+    } catch (e) {
+      console.error('Error updating cart count:', e);
+    }
+  }
+
+  function setupCartSubscription() {
+    // Desuscribirse si ya existe una subscripción previa
+    if (unsubscribeCart) {
+      unsubscribeCart();
+    }
+
+    // Subscribirse SOLO al store base, no a computed stores
+    // para evitar cascadas de notificaciones
+    unsubscribeCart = $cart.subscribe(() => {
+      // Pequeño delay para agrupar múltiples cambios
+      setTimeout(() => {
+        updateCartCount();
+      }, 0);
+    });
+  }
+
   // Inicializar al cargar la página
-  document.addEventListener('DOMContentLoaded', setupMobileMenu);
+  document.addEventListener('DOMContentLoaded', () => {
+    setupMobileMenu();
+    updateCartCount();
+    setupCartSubscription();
+  });
 
   // Reinicializar en transiciones de Astro
-  document.addEventListener('astro:page-load', setupMobileMenu);
+  document.addEventListener('astro:page-load', () => {
+    setupMobileMenu();
+    updateCartCount();
+    setupCartSubscription();
+  });
+
+  // ===== FUNCIONALIDAD DE BÚSQUEDA =====
+
+  const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://provifood-ecommerce-backend.onrender.com/api/v1';
+
+  // Debounce para evitar llamadas excesivas a la API
+  function debounce(func: Function, wait: number) {
+    let timeout: ReturnType<typeof setTimeout>;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Buscar productos en la API
+  async function searchProducts(query: string): Promise<any[]> {
+    if (!query || query.trim().length < 2) {
+      return [];
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/products?search=${encodeURIComponent(query)}&limit=8`);
+      if (!response.ok) throw new Error('Error en búsqueda');
+      const products = await response.json();
+      return products;
+    } catch (error) {
+      console.error('Error searching products:', error);
+      return [];
+    }
+  }
+
+  // Renderizar resultados de búsqueda
+  function renderSearchResults(products: any[], resultsContainer: HTMLElement, inputElement: HTMLInputElement) {
+    if (products.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="p-6 text-center">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <p class="text-provifood-gray">No se encontraron productos</p>
+          <p class="text-sm text-gray-400 mt-1">Intenta con otros términos</p>
+        </div>
+      `;
+      resultsContainer.classList.remove('hidden');
+      return;
+    }
+
+    resultsContainer.innerHTML = `
+      <div class="py-2">
+        <div class="px-4 py-2 text-xs font-semibold text-provifood-gray uppercase border-b border-gray-100">
+          ${products.length} resultado${products.length !== 1 ? 's' : ''}
+        </div>
+        ${products.map(product => `
+          <a href="/producto/${product.id}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+            <div class="w-12 h-12 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200">
+              ${product.image_url ?
+                `<img src="${product.image_url}" alt="${product.name}" class="max-w-full max-h-full object-contain" />` :
+                `<svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>`
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-provifood-dark truncate">${product.name}</p>
+              ${product.brand ? `<p class="text-xs text-gray-400">${product.brand}</p>` : ''}
+              <p class="text-sm font-bold text-provifood-primary mt-1">$${product.price.toLocaleString('es-CL')}</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        `).join('')}
+        <a href="/productos?q=${encodeURIComponent(inputElement.value)}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-provifood-primary hover:bg-provifood-primary/5 border-t-2 border-gray-200">
+          Ver todos los resultados
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    `;
+    resultsContainer.classList.remove('hidden');
+  }
+
+  // Configurar búsqueda para un input específico
+  function setupSearch(inputId: string, resultsId: string, buttonId: string) {
+    const inputElement = document.getElementById(inputId) as HTMLInputElement;
+    const resultsContainer = document.getElementById(resultsId) as HTMLElement;
+    const searchButton = document.getElementById(buttonId) as HTMLElement;
+
+    if (!inputElement || !resultsContainer || !searchButton) return;
+
+    // Búsqueda con debounce mientras se escribe
+    const debouncedSearch = debounce(async (query: string) => {
+      if (query.trim().length < 2) {
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      const products = await searchProducts(query);
+      renderSearchResults(products, resultsContainer, inputElement);
+    }, 300);
+
+    // Input event - búsqueda mientras se escribe
+    inputElement.addEventListener('input', (e) => {
+      const query = (e.target as HTMLInputElement).value;
+      debouncedSearch(query);
+    });
+
+    // Enter key - navegar a página de resultados
+    inputElement.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const query = inputElement.value.trim();
+        if (query) {
+          window.location.href = `/productos?q=${encodeURIComponent(query)}`;
+        }
+      }
+    });
+
+    // Click en botón de búsqueda - navegar a página de resultados
+    searchButton.addEventListener('click', () => {
+      const query = inputElement.value.trim();
+      if (query) {
+        window.location.href = `/productos?q=${encodeURIComponent(query)}`;
+      }
+    });
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!inputElement.contains(e.target as Node) && !resultsContainer.contains(e.target as Node)) {
+        resultsContainer.classList.add('hidden');
+      }
+    });
+
+    // Focus - mostrar resultados si hay búsqueda previa
+    inputElement.addEventListener('focus', () => {
+      if (inputElement.value.trim().length >= 2 && resultsContainer.innerHTML) {
+        resultsContainer.classList.remove('hidden');
+      }
+    });
+  }
+
+  // Inicializar búsqueda
+  function initSearch() {
+    setupSearch('search-input-desktop', 'search-results-desktop', 'search-button-desktop');
+    setupSearch('search-input-mobile', 'search-results-mobile', 'search-button-mobile');
+  }
+
+  // Inicializar al cargar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    setupMobileMenu();
+    updateCartCount();
+    initSearch();
+  });
+
+  // Reinicializar en transiciones de Astro
+  document.addEventListener('astro:page-load', () => {
+    setupMobileMenu();
+    updateCartCount();
+    initSearch();
+  });
 </script>
