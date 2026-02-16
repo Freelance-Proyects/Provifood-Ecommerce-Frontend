@@ -360,12 +360,20 @@ import Button from '../components/ui/Button.astro';
 
     // Botones de eliminar
     document.querySelectorAll('.remove-item').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = (e.currentTarget as HTMLElement).dataset.id!;
         const cart = $cartItems.get();
         const item = cart.find(i => i.id.toString() === id);
 
-        if (confirm(`¿Estás seguro de eliminar ${item?.name || 'este producto'}?`)) {
+        const confirmed = await window.showConfirmModal({
+          title: '¿Eliminar producto?',
+          message: `¿Estás seguro de eliminar ${item?.name || 'este producto'} del carrito?`,
+          confirmText: 'Eliminar',
+          cancelText: 'Cancelar',
+          type: 'danger'
+        });
+
+        if (confirmed) {
           removeFromCart(id);
         }
       });
@@ -374,8 +382,16 @@ import Button from '../components/ui/Button.astro';
     // Botón vaciar carrito
     const emptyBtn = document.getElementById('empty-cart-btn');
     if (emptyBtn) {
-      emptyBtn.addEventListener('click', () => {
-        if (confirm('¿Estás seguro de vaciar todo el carrito?')) {
+      emptyBtn.addEventListener('click', async () => {
+        const confirmed = await window.showConfirmModal({
+          title: '¿Vaciar carrito?',
+          message: '¿Estás seguro de vaciar todo el carrito? Esta acción no se puede deshacer.',
+          confirmText: 'Vaciar carrito',
+          cancelText: 'Cancelar',
+          type: 'danger'
+        });
+
+        if (confirmed) {
           clearCart();
         }
       });

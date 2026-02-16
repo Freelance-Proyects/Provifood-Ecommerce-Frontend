@@ -12,17 +12,24 @@ import { productsApi } from '../lib/api';
 const allProducts = await productsApi.getAll({ limit: 12 });
 
 // Convertir a formato compatible con ProductCard
-const featuredProducts = allProducts.map(product => ({
-  id: product.id,
-  name: product.name,
-  description: product.description || '',
-  price: product.price,
-  image_url: product.image_url || '',
-  stock: product.stock,
-  inStock: product.stock > 0,
-  category: product.category || 'Sin categoría',
-  brand: product.brand || ''
-}));
+const featuredProducts = allProducts
+  .map(product => ({
+    id: product.id,
+    name: product.name,
+    description: product.description || '',
+    price: product.price,
+    image_url: product.image_url || '',
+    stock: product.stock,
+    inStock: product.stock > 0,
+    category: product.category || 'Sin categoría',
+    brand: product.brand || ''
+  }))
+  // Ordenar productos: con stock primero, sin stock al final
+  .sort((a, b) => {
+    if (a.inStock && !b.inStock) return -1;
+    if (!a.inStock && b.inStock) return 1;
+    return 0;
+  });
 ---
 
 <Layout title="Provifood - Distribuidora de Alimentos al Por Mayor y Menor">

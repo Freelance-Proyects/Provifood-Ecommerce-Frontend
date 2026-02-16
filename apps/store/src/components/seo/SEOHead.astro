@@ -1,0 +1,133 @@
+---
+import type { Product } from '@provifood/types';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  url?: string;
+  type?: 'website' | 'product' | 'article';
+  product?: Partial<Product>;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Provifood - Tu mayorista de confianza. Amplio catálogo de productos alimenticios y de consumo masivo con los mejores precios.',
+  image = '/images/og-default.jpg',
+  url = Astro.url.href,
+  type = 'website',
+  product,
+  noindex = false
+} = Astro.props;
+
+const siteName = 'Provifood';
+const twitterHandle = '@provifood';
+
+// Construir título completo
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+
+// Helper para construir URLs absolutas de imágenes
+const getAbsoluteImageUrl = (imagePath: string): string => {
+  // Si ya es una URL absoluta, devolverla tal cual
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+
+  // Si Astro.site está definido, usarlo como base
+  if (Astro.site) {
+    return new URL(imagePath, Astro.site).href;
+  }
+
+  // Fallback: usar el origin actual o devolver la ruta relativa
+  if (typeof Astro.url !== 'undefined' && Astro.url.origin) {
+    return new URL(imagePath, Astro.url.origin).href;
+  }
+
+  return imagePath;
+};
+
+const absoluteImageUrl = getAbsoluteImageUrl(image);
+
+// Si es un producto, usar datos estructurados
+const structuredData = product ? {
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": product.name,
+  "description": product.description || description,
+  "image": product.image_url || image,
+  "offers": {
+    "@type": "Offer",
+    "price": product.price,
+    "priceCurrency": "CLP",
+    "availability": product.stock && product.stock > 0
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
+    "seller": {
+      "@type": "Organization",
+      "name": siteName
+    }
+  },
+  "brand": product.brand ? {
+    "@type": "Brand",
+    "name": product.brand
+  } : undefined,
+  "category": product.category,
+  "sku": product.sku
+} : {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": siteName,
+  "url": Astro.site?.href || Astro.url.origin,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${Astro.site?.href || Astro.url.origin}/productos?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+---
+
+<!-- Primary Meta Tags -->
+<title>{fullTitle}</title>
+<meta name="title" content={fullTitle} />
+<meta name="description" content={description} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={url} />
+
+<!-- Robots -->
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={url} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={absoluteImageUrl} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="es_CL" />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={url} />
+<meta property="twitter:title" content={fullTitle} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={absoluteImageUrl} />
+<meta property="twitter:site" content={twitterHandle} />
+<meta property="twitter:creator" content={twitterHandle} />
+
+<!-- Product specific meta tags -->
+{product && (
+  <>
+    <meta property="product:price:amount" content={product.price?.toString()} />
+    <meta property="product:price:currency" content="CLP" />
+    {product.brand && <meta property="product:brand" content={product.brand} />}
+    {product.category && <meta property="product:category" content={product.category} />}
+  </>
+)}
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />

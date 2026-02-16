@@ -19,8 +19,13 @@
             placeholder="Buscar productos, marcas..."
             class="w-full px-4 py-2 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none"
             autocomplete="off"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="search-results-desktop"
+            aria-autocomplete="list"
+            aria-label="Buscar productos"
           />
-          <button id="search-button-desktop" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-1.5 rounded">
+          <button id="search-button-desktop" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-1.5 rounded" aria-label="Buscar">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -68,8 +73,13 @@
             placeholder="Buscar productos..."
             class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:border-provifood-primary focus:outline-none text-base"
             autocomplete="off"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="search-results-mobile"
+            aria-autocomplete="list"
+            aria-label="Buscar productos"
           />
-          <button id="search-button-mobile" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-2 rounded">
+          <button id="search-button-mobile" class="absolute right-2 top-1/2 -translate-y-1/2 bg-provifood-secondary hover:bg-orange-600 text-white px-4 py-2 rounded" aria-label="Buscar">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -261,11 +271,46 @@
     }
   }
 
+  // Resaltar texto coincidente
+  function highlightMatch(text: string, query: string): string {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark class="bg-yellow-200 font-semibold">$1</mark>');
+  }
+
+  // Mostrar estado de carga
+  function showLoadingState(resultsContainer: HTMLElement) {
+    resultsContainer.innerHTML = `
+      <div class="p-6 text-center">
+        <svg class="animate-spin h-8 w-8 mx-auto text-provifood-primary mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-sm text-provifood-gray">Buscando productos...</p>
+      </div>
+    `;
+    resultsContainer.classList.remove('hidden');
+  }
+
+  // Ocultar dropdown y actualizar ARIA
+  function hideDropdown(resultsContainer: HTMLElement, inputElement: HTMLInputElement) {
+    resultsContainer.classList.add('hidden');
+    inputElement.setAttribute('aria-expanded', 'false');
+  }
+
+  // Mostrar dropdown y actualizar ARIA
+  function showDropdown(resultsContainer: HTMLElement, inputElement: HTMLInputElement) {
+    resultsContainer.classList.remove('hidden');
+    inputElement.setAttribute('aria-expanded', 'true');
+  }
+
   // Renderizar resultados de búsqueda
   function renderSearchResults(products: any[], resultsContainer: HTMLElement, inputElement: HTMLInputElement) {
+    const query = inputElement.value.trim();
+
     if (products.length === 0) {
       resultsContainer.innerHTML = `
-        <div class="p-6 text-center">
+        <div class="p-6 text-center" role="status" aria-live="polite">
           <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -273,17 +318,21 @@
           <p class="text-sm text-gray-400 mt-1">Intenta con otros términos</p>
         </div>
       `;
-      resultsContainer.classList.remove('hidden');
+      showDropdown(resultsContainer, inputElement);
       return;
     }
 
     resultsContainer.innerHTML = `
-      <div class="py-2">
-        <div class="px-4 py-2 text-xs font-semibold text-provifood-gray uppercase border-b border-gray-100">
+      <div class="py-2" role="listbox" aria-label="Resultados de búsqueda">
+        <div class="px-4 py-2 text-xs font-semibold text-provifood-gray uppercase border-b border-gray-100" role="status" aria-live="polite">
           ${products.length} resultado${products.length !== 1 ? 's' : ''}
         </div>
-        ${products.map(product => `
-          <a href="/producto/${product.id}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+        ${products.map((product, index) => `
+          <a href="/producto/${product.id}"
+             class="search-result-item flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 focus:bg-provifood-primary/10 focus:outline-none transition-colors"
+             data-index="${index}"
+             role="option"
+             aria-label="Ver ${product.name} - $${product.price.toLocaleString('es-CL')}">
             <div class="w-12 h-12 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200">
               ${product.image_url ?
                 `<img src="${product.image_url}" alt="${product.name}" class="max-w-full max-h-full object-contain" />` :
@@ -293,8 +342,8 @@
               }
             </div>
             <div class="flex-1 min-w-0">
-              <p class="font-semibold text-sm text-provifood-dark truncate">${product.name}</p>
-              ${product.brand ? `<p class="text-xs text-gray-400">${product.brand}</p>` : ''}
+              <p class="font-semibold text-sm text-provifood-dark truncate">${highlightMatch(product.name, query)}</p>
+              ${product.brand ? `<p class="text-xs text-gray-400">${highlightMatch(product.brand, query)}</p>` : ''}
               <p class="text-sm font-bold text-provifood-primary mt-1">$${product.price.toLocaleString('es-CL')}</p>
             </div>
             <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +351,9 @@
             </svg>
           </a>
         `).join('')}
-        <a href="/productos?q=${encodeURIComponent(inputElement.value)}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-provifood-primary hover:bg-provifood-primary/5 border-t-2 border-gray-200">
+        <a href="/productos?q=${encodeURIComponent(query)}"
+           class="search-result-all flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-provifood-primary hover:bg-provifood-primary/5 focus:bg-provifood-primary/10 focus:outline-none border-t-2 border-gray-200 transition-colors"
+           role="option">
           Ver todos los resultados
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -310,7 +361,7 @@
         </a>
       </div>
     `;
-    resultsContainer.classList.remove('hidden');
+    showDropdown(resultsContainer, inputElement);
   }
 
   // Configurar búsqueda para un input específico
@@ -321,15 +372,26 @@
 
     if (!inputElement || !resultsContainer || !searchButton) return;
 
+    let currentFocusIndex = -1;
+    let isSearching = false;
+
     // Búsqueda con debounce mientras se escribe
     const debouncedSearch = debounce(async (query: string) => {
       if (query.trim().length < 2) {
-        resultsContainer.classList.add('hidden');
+        hideDropdown(resultsContainer, inputElement);
+        isSearching = false;
         return;
       }
 
+      // Mostrar loading
+      showLoadingState(resultsContainer);
+      showDropdown(resultsContainer, inputElement);
+      isSearching = true;
+
       const products = await searchProducts(query);
+      isSearching = false;
       renderSearchResults(products, resultsContainer, inputElement);
+      currentFocusIndex = -1;
     }, 300);
 
     // Input event - búsqueda mientras se escribe
@@ -338,14 +400,41 @@
       debouncedSearch(query);
     });
 
-    // Enter key - navegar a página de resultados
+    // Keyboard navigation
     inputElement.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      const resultItems = resultsContainer.querySelectorAll('.search-result-item, .search-result-all');
+
+      // Arrow Down
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (resultItems.length === 0) return;
+
+        currentFocusIndex = (currentFocusIndex + 1) % resultItems.length;
+        (resultItems[currentFocusIndex] as HTMLElement).focus();
+      }
+
+      // Arrow Up
+      else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (resultItems.length === 0) return;
+
+        currentFocusIndex = currentFocusIndex <= 0 ? resultItems.length - 1 : currentFocusIndex - 1;
+        (resultItems[currentFocusIndex] as HTMLElement).focus();
+      }
+
+      // Enter key - navegar a página de resultados completa
+      else if (e.key === 'Enter') {
         e.preventDefault();
         const query = inputElement.value.trim();
-        if (query) {
+        if (query && !isSearching) {
           window.location.href = `/productos?q=${encodeURIComponent(query)}`;
         }
+      }
+
+      // Escape key - cerrar dropdown
+      else if (e.key === 'Escape') {
+        hideDropdown(resultsContainer, inputElement);
+        currentFocusIndex = -1;
       }
     });
 
@@ -360,14 +449,15 @@
     // Cerrar dropdown al hacer clic fuera
     document.addEventListener('click', (e) => {
       if (!inputElement.contains(e.target as Node) && !resultsContainer.contains(e.target as Node)) {
-        resultsContainer.classList.add('hidden');
+        hideDropdown(resultsContainer, inputElement);
+        currentFocusIndex = -1;
       }
     });
 
     // Focus - mostrar resultados si hay búsqueda previa
     inputElement.addEventListener('focus', () => {
-      if (inputElement.value.trim().length >= 2 && resultsContainer.innerHTML) {
-        resultsContainer.classList.remove('hidden');
+      if (inputElement.value.trim().length >= 2 && resultsContainer.innerHTML && !isSearching) {
+        showDropdown(resultsContainer, inputElement);
       }
     });
   }

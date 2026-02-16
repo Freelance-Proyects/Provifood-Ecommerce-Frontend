@@ -1,0 +1,235 @@
+---
+// Componente de notificaciones Toast
+---
+
+<!-- Responsive: top-center en móvil, top-right en desktop -->
+<div
+  id="toast-container"
+  class="fixed top-4 left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0 z-[9999] flex flex-col gap-3 w-[calc(100%-2rem)] max-w-md pointer-events-none"
+  role="region"
+  aria-label="Notificaciones"
+>
+  <!-- Las notificaciones se renderizarán aquí dinámicamente -->
+</div>
+
+<script>
+  import { $notifications, removeNotification } from '@/stores/notifications'
+  import type { Notification } from '@/stores/notifications'
+
+  const container = document.getElementById('toast-container')
+  if (!container) throw new Error('Toast container not found')
+
+  const MAX_TOASTS = 5 // Límite de notificaciones simultáneas
+
+  function getIcon(type: string) {
+    switch (type) {
+      case 'success':
+        return `<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`
+      case 'error':
+        return `<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`
+      case 'warning':
+        return `<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>`
+      case 'info':
+        return `<svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`
+      default:
+        return ''
+    }
+  }
+
+  function getColors(type: string) {
+    switch (type) {
+      case 'success':
+        return {
+          bg: 'bg-green-50',
+          border: 'border-green-500',
+          icon: 'text-green-600',
+          title: 'text-green-800',
+          message: 'text-green-700',
+        }
+      case 'error':
+        return {
+          bg: 'bg-red-50',
+          border: 'border-red-500',
+          icon: 'text-red-600',
+          title: 'text-red-800',
+          message: 'text-red-700',
+        }
+      case 'warning':
+        return {
+          bg: 'bg-orange-50',
+          border: 'border-orange-500',
+          icon: 'text-orange-600',
+          title: 'text-orange-800',
+          message: 'text-orange-700',
+        }
+      case 'info':
+        return {
+          bg: 'bg-blue-50',
+          border: 'border-blue-500',
+          icon: 'text-blue-600',
+          title: 'text-blue-800',
+          message: 'text-blue-700',
+        }
+      default:
+        return {
+          bg: 'bg-gray-50',
+          border: 'border-gray-500',
+          icon: 'text-gray-600',
+          title: 'text-gray-800',
+          message: 'text-gray-700',
+        }
+    }
+  }
+
+  function getAriaLive(type: string): 'polite' | 'assertive' {
+    // Errores son más urgentes, el resto puede esperar
+    return type === 'error' ? 'assertive' : 'polite'
+  }
+
+  function createToastElement(notification: Notification): HTMLElement {
+    const colors = getColors(notification.type)
+    const icon = getIcon(notification.type)
+    const ariaLive = getAriaLive(notification.type)
+
+    const div = document.createElement('div')
+    div.id = notification.id
+    div.className = `${colors.bg} ${colors.border} border-l-4 rounded-lg shadow-lg p-4 pointer-events-auto transform transition-all duration-300 ease-out translate-x-0 opacity-100 animate-slide-in`
+    div.setAttribute('role', 'alert')
+    div.setAttribute('aria-live', ariaLive)
+    div.setAttribute('aria-atomic', 'true')
+
+    div.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="${colors.icon}">
+          ${icon}
+        </div>
+        <div class="flex-1 min-w-0">
+          <h4 class="${colors.title} font-bold text-sm mb-1">
+            ${notification.title}
+          </h4>
+          ${notification.message ? `
+            <p class="${colors.message} text-sm leading-relaxed">
+              ${notification.message}
+            </p>
+          ` : ''}
+        </div>
+        <button
+          class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+          onclick="window.closeToast('${notification.id}')"
+          aria-label="Cerrar notificación: ${notification.title}"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    `
+
+    return div
+  }
+
+  function animateOut(element: HTMLElement): Promise<void> {
+    return new Promise((resolve) => {
+      element.classList.add('animate-slide-out')
+      element.addEventListener('animationend', () => {
+        element.remove()
+        resolve()
+      }, { once: true })
+    })
+  }
+
+  function renderToasts(notifications: Notification[]) {
+    // Limitar a MAX_TOASTS notificaciones
+    const limitedNotifications = notifications.slice(-MAX_TOASTS)
+
+    // Si había más notificaciones, remover las antiguas del store
+    if (notifications.length > MAX_TOASTS) {
+      const toRemove = notifications.slice(0, notifications.length - MAX_TOASTS)
+      toRemove.forEach(n => removeNotification(n.id))
+    }
+
+    // Obtener IDs actuales
+    const currentIds = new Set(limitedNotifications.map(n => n.id))
+    const renderedElements = Array.from(container.querySelectorAll('[id^="notification-"]'))
+
+    // Eliminar toasts que ya no están en el store (con animación)
+    renderedElements.forEach(el => {
+      if (!currentIds.has(el.id)) {
+        animateOut(el as HTMLElement)
+      }
+    })
+
+    // Agregar nuevos toasts
+    limitedNotifications.forEach(notification => {
+      if (!document.getElementById(notification.id)) {
+        const element = createToastElement(notification)
+        container.appendChild(element)
+      }
+    })
+  }
+
+  // Función global para cerrar toast
+  window.closeToast = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      animateOut(element).then(() => {
+        removeNotification(id)
+      })
+    } else {
+      removeNotification(id)
+    }
+  }
+
+  // Subscribirse a cambios
+  $notifications.subscribe(renderToasts)
+
+  // Renderizar inicial
+  renderToasts($notifications.get())
+</script>
+
+<style>
+  @keyframes slide-in {
+    from {
+      transform: translateY(-1rem);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-out {
+    from {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-0.5rem) scale(0.95);
+      opacity: 0;
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  .animate-slide-out {
+    animation: slide-out 0.2s ease-in forwards;
+  }
+
+  /* Responsive positioning adjustments */
+  @media (max-width: 768px) {
+    #toast-container {
+      max-width: calc(100% - 2rem);
+    }
+  }
+</style>

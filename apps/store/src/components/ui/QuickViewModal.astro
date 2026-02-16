@@ -1,0 +1,246 @@
+---
+// Quick View Modal para vista rápida de productos
+---
+
+<div id="quick-view-modal" class="fixed inset-0 z-[10000] hidden" role="dialog" aria-modal="true" aria-labelledby="quick-view-title">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" id="quick-view-overlay"></div>
+
+  <!-- Modal -->
+  <div class="relative min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full transform transition-all scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
+      <!-- Close button -->
+      <button
+        id="quick-view-close"
+        class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-gray-900 transition-colors shadow-lg"
+        aria-label="Cerrar vista rápida"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Content -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-8">
+        <!-- Imagen -->
+        <div class="relative bg-gray-50 rounded-lg aspect-square flex items-center justify-center p-6">
+          <img
+            id="quick-view-image"
+            src=""
+            alt=""
+            class="max-w-full max-h-full object-contain"
+          />
+          <div id="quick-view-badge" class="hidden absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+            Sin Stock
+          </div>
+        </div>
+
+        <!-- Información -->
+        <div class="flex flex-col space-y-4">
+          <!-- Marca -->
+          <span id="quick-view-brand" class="text-sm text-gray-500 uppercase tracking-wide"></span>
+
+          <!-- Nombre -->
+          <h2 id="quick-view-title" class="text-2xl md:text-3xl font-bold text-provifood-dark leading-tight"></h2>
+
+          <!-- Categoría -->
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-provifood-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span id="quick-view-category" class="text-provifood-primary font-medium capitalize"></span>
+          </div>
+
+          <!-- Descripción -->
+          <p id="quick-view-description" class="text-provifood-gray leading-relaxed"></p>
+
+          <!-- Precio y Stock -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-sm text-gray-500 mb-2">Precio</p>
+            <p id="quick-view-price" class="text-3xl font-bold text-provifood-primary mb-4"></p>
+
+            <div id="quick-view-stock-info" class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span id="quick-view-stock-text" class="text-green-600 font-semibold"></span>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="space-y-3 pt-4">
+            <button
+              id="quick-view-add-to-cart"
+              class="w-full bg-provifood-secondary hover:bg-orange-600 text-white font-bold py-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Agregar al Carrito</span>
+            </button>
+
+            <button
+              id="quick-view-details"
+              class="w-full border-2 border-provifood-primary text-provifood-primary hover:bg-provifood-primary hover:text-white font-semibold py-3 rounded-lg transition-colors"
+            >
+              Ver Detalles Completos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { addToCart, getQuantityInCart } from '@/stores/cart'
+  import { showSuccess, showWarning } from '@/stores/notifications'
+  import type { Product } from '@provifood/types'
+
+  let currentProduct: Product | null = null
+
+  function showQuickView(product: Product) {
+    currentProduct = product
+    const modal = document.getElementById('quick-view-modal')
+    if (!modal) return
+
+    // Populate modal with product data
+    const img = document.getElementById('quick-view-image') as HTMLImageElement
+    const brand = document.getElementById('quick-view-brand')
+    const title = document.getElementById('quick-view-title')
+    const category = document.getElementById('quick-view-category')
+    const description = document.getElementById('quick-view-description')
+    const price = document.getElementById('quick-view-price')
+    const stockInfo = document.getElementById('quick-view-stock-info')
+    const stockText = document.getElementById('quick-view-stock-text')
+    const badge = document.getElementById('quick-view-badge')
+    const addToCartBtn = document.getElementById('quick-view-add-to-cart') as HTMLButtonElement
+
+    if (img) {
+      img.src = product.image_url || ''
+      img.alt = product.name
+    }
+    if (brand) brand.textContent = product.brand || ''
+    if (title) title.textContent = product.name
+    if (category) category.textContent = product.category || ''
+    if (description) description.textContent = product.description || 'Sin descripción disponible'
+    if (price) price.textContent = `$${product.price.toLocaleString('es-CL')}`
+
+    const isInStock = product.stock > 0
+
+    if (stockInfo && stockText) {
+      if (isInStock) {
+        stockInfo.className = 'flex items-center space-x-2'
+        stockText.className = product.stock <= 5 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold'
+        stockText.textContent = product.stock <= 5 ? `Solo quedan ${product.stock}` : 'En Stock'
+      } else {
+        stockInfo.className = 'flex items-center space-x-2'
+        stockText.className = 'text-red-600 font-semibold'
+        stockText.textContent = 'Sin Stock'
+      }
+    }
+
+    if (badge) {
+      badge.classList.toggle('hidden', isInStock)
+    }
+
+    if (addToCartBtn) {
+      addToCartBtn.disabled = !isInStock
+      addToCartBtn.classList.toggle('bg-gray-300', !isInStock)
+      addToCartBtn.classList.toggle('cursor-not-allowed', !isInStock)
+    }
+
+    // Show modal
+    modal.classList.remove('hidden')
+    document.body.style.overflow = 'hidden'
+  }
+
+  function hideQuickView() {
+    const modal = document.getElementById('quick-view-modal')
+    if (modal) {
+      modal.classList.add('hidden')
+      document.body.style.overflow = ''
+      currentProduct = null
+    }
+  }
+
+  function initQuickView() {
+    // Close button
+    const closeBtn = document.getElementById('quick-view-close')
+    closeBtn?.addEventListener('click', hideQuickView)
+
+    // Overlay click
+    const overlay = document.getElementById('quick-view-overlay')
+    overlay?.addEventListener('click', hideQuickView)
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('quick-view-modal')
+      if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        hideQuickView()
+      }
+    })
+
+    // Add to cart button
+    const addToCartBtn = document.getElementById('quick-view-add-to-cart')
+    addToCartBtn?.addEventListener('click', () => {
+      if (!currentProduct) return
+
+      const button = addToCartBtn as HTMLButtonElement
+      if (button.disabled) return
+
+      const wasInCart = getQuantityInCart(currentProduct.id) > 0
+      const originalHTML = button.innerHTML
+      button.disabled = true
+      button.innerHTML = `
+        <svg class="animate-spin h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      `
+
+      setTimeout(() => {
+        const success = addToCart(currentProduct!, 1)
+
+        if (success) {
+          const quantityInCart = getQuantityInCart(currentProduct!.id)
+          const units = quantityInCart > 1 ? 'es' : ''
+
+          if (wasInCart) {
+            showSuccess('Cantidad actualizada', `${currentProduct!.name} - Tienes ${quantityInCart} unidad${units} en tu carrito.`)
+          } else {
+            showSuccess(`${currentProduct!.name} agregado al carrito`, `Tienes ${quantityInCart} unidad${units} en tu carrito.`)
+          }
+
+          // Close modal after adding
+          setTimeout(() => hideQuickView(), 500)
+        } else {
+          const quantityInCart = getQuantityInCart(currentProduct!.id)
+          if (quantityInCart > 0) {
+            showWarning('Stock insuficiente', `Solo hay ${currentProduct!.stock} unidades disponibles. Ya tienes ${quantityInCart} en tu carrito.`)
+          } else {
+            showWarning('Producto sin stock', `${currentProduct!.name} no está disponible en este momento.`)
+          }
+        }
+
+        button.disabled = false
+        button.innerHTML = originalHTML
+      }, 300)
+    })
+
+    // View details button
+    const detailsBtn = document.getElementById('quick-view-details')
+    detailsBtn?.addEventListener('click', () => {
+      if (currentProduct) {
+        window.location.href = `/producto/${currentProduct.id}`
+      }
+    })
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', initQuickView)
+  document.addEventListener('astro:page-load', initQuickView)
+
+  // Export function globally
+  window.showQuickView = showQuickView
+</script>

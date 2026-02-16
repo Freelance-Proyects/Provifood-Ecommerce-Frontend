@@ -1,35 +1,69 @@
 ---
 import type { AstroGlobal } from 'astro';
+import type { Product } from '@provifood/types';
+import SEOHead from '../components/seo/SEOHead.astro';
+import Toast from '../components/ui/Toast.astro';
+import ConfirmModal from '../components/ui/ConfirmModal.astro';
+import QuickViewModal from '../components/ui/QuickViewModal.astro';
 import '../styles/global.css';
 
 interface Props {
   title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'product' | 'article';
+  product?: Partial<Product>;
+  noindex?: boolean;
 }
 
-const { title = 'Provifood - Tu tienda de alimentos' } = Astro.props;
+const {
+  title = 'Provifood - Tu tienda de alimentos',
+  description,
+  image,
+  type,
+  product,
+  noindex
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00B4A8" />
     <link rel="icon" type="image/png" href="/navlogo.png" />
-    
+
+    <!-- SEO Component -->
+    <SEOHead
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      product={product}
+      noindex={noindex}
+    />
+
     <!-- Preconnect para recursos externos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://provifood-ecommerce-backend.onrender.com">
-    
+
     <!-- DNS Prefetch para imágenes de Supabase -->
     <link rel="dns-prefetch" href="https://kbvyzltxxnxszrsoymdi.supabase.co">
-    
+
     <!-- Google Fonts - Open Sans con display=swap para evitar FOIT -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <title>{title}</title>
   </head>
   <body class="bg-white font-sans text-provifood-dark m-0 p-0">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[10000] focus:px-4 focus:py-2 focus:bg-provifood-primary focus:text-white focus:rounded-lg">
+      Saltar al contenido principal
+    </a>
+
     <slot />
+    <Toast />
+    <ConfirmModal />
+    <QuickViewModal />
   </body>
 </html>

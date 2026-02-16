@@ -189,5 +189,18 @@ export {
   SORT_OPTIONS,
 } from './search'
 
+// Notifications Store
+export {
+  $notifications,
+  showNotification,
+  removeNotification,
+  showSuccess,
+  showError,
+  showWarning,
+  showInfo,
+} from './notifications'
+
+export type { Notification, NotificationType } from './notifications'
+
 // Re-export types
 export type * from '../types/store.types'

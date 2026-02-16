@@ -135,7 +135,13 @@ const products = allProducts
     inStock: product.stock > 0,
     category: product.category,
     brand: product.brand || ''
-  }));
+  }))
+  // Ordenar productos: con stock primero, sin stock al final
+  .sort((a, b) => {
+    if (a.inStock && !b.inStock) return -1;
+    if (!a.inStock && b.inStock) return 1;
+    return 0;
+  });
 
 // Calcular paginación dinámica
 const productsPerPage = 100; // Mostrar hasta 100 productos por página
@@ -275,8 +281,9 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
           <!-- Grid de productos -->
           <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div 
-                class="product-item" 
+              <div
+                class="product-item"
+                data-name={product.name}
                 data-brand={product.brand}
                 data-price={product.price}
                 data-in-stock={product.inStock ? 'true' : 'false'}
@@ -364,25 +371,33 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
   function sortProducts(sortBy) {
     const grid = document.getElementById('products-grid');
     const items = Array.from(grid.querySelectorAll('.product-item'));
-    
+
     items.sort((a, b) => {
+      const inStockA = a.dataset.inStock === 'true';
+      const inStockB = b.dataset.inStock === 'true';
+
+      // SIEMPRE ordenar por stock primero (con stock antes que sin stock)
+      if (inStockA && !inStockB) return -1;
+      if (!inStockA && inStockB) return 1;
+
+      // Si ambos tienen el mismo estado de stock, aplicar el ordenamiento seleccionado
       const priceA = parseFloat(a.dataset.price);
       const priceB = parseFloat(b.dataset.price);
-      const brandA = a.dataset.brand.toLowerCase();
-      const brandB = b.dataset.brand.toLowerCase();
-      
+      const nameA = a.dataset.name?.toLowerCase() || '';
+      const nameB = b.dataset.name?.toLowerCase() || '';
+
       switch(sortBy) {
         case 'price-asc':
           return priceA - priceB;
         case 'price-desc':
           return priceB - priceA;
         case 'name':
-          return brandA.localeCompare(brandB);
+          return nameA.localeCompare(nameB);
         default:
           return 0;
       }
     });
-    
+
     // Reordenar en el DOM
     items.forEach(item => grid.appendChild(item));
   }

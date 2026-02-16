@@ -29,16 +29,31 @@ const products = allProducts.map(product => ({
   brand: product.brand || ''
 }));
 
+// Ordenar productos: con stock primero, sin stock al final
+const sortedProducts = products.sort((a, b) => {
+  // Primero ordenar por stock (con stock antes que sin stock)
+  if (a.inStock && !b.inStock) return -1;
+  if (!a.inStock && b.inStock) return 1;
+  // Si ambos tienen el mismo estado de stock, mantener orden original
+  return 0;
+});
+
 // Calcular paginación dinámica
 const productsPerPage = 100; // Mostrar hasta 100 productos por página
-const totalPages = Math.ceil(products.length / productsPerPage);
+const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
 const currentPage = 1;
 
 // Obtener marcas únicas
-const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sort();
+const uniqueBrands = [...new Set(sortedProducts.map(p => p.brand).filter(b => b))].sort();
+
+// SEO data
+const pageTitle = searchQuery ? `Resultados para "${searchQuery}"` : 'Todos los Productos';
+const pageDescription = searchQuery
+  ? `${sortedProducts.length} productos encontrados para "${searchQuery}" en Provifood`
+  : 'Explora nuestro amplio catálogo de productos alimenticios y de consumo masivo con los mejores precios mayoristas';
 ---
 
-<Layout title="Todos los Productos - Provifood">
+<Layout title={pageTitle} description={pageDescription}>
   <TopBar />
   <Navbar />
   <CategoryMenu />
@@ -213,7 +228,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
           <!-- Barra de ordenamiento -->
           <div class="bg-white rounded-lg shadow-sm p-4 mb-6 flex items-center justify-between">
             <p class="text-provifood-gray">
-              <span class="font-semibold text-provifood-dark" id="products-count">{products.length}</span> productos encontrados
+              <span class="font-semibold text-provifood-dark" id="products-count">{sortedProducts.length}</span> productos encontrados
             </p>
             <div class="flex items-center gap-3">
               <span class="text-sm text-provifood-gray">Ordenar por:</span>
@@ -228,7 +243,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
 
           <!-- Grid de productos -->
           <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.length === 0 ? (
+            {sortedProducts.length === 0 ? (
               <div class="col-span-full">
                 <div class="bg-white rounded-2xl shadow-lg p-16 text-center border-2 border-gray-100">
                   <div class="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -264,9 +279,10 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
                 </div>
               </div>
             ) : (
-              products.map((product) => (
+              sortedProducts.map((product) => (
                 <div
                   class="product-item"
+                  data-name={product.name}
                   data-brand={product.brand}
                   data-price={product.price}
                   data-category={product.category}
@@ -361,25 +377,33 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
   function sortProducts(sortBy) {
     const grid = document.getElementById('products-grid');
     const items = Array.from(grid.querySelectorAll('.product-item'));
-    
+
     items.sort((a, b) => {
+      const inStockA = a.dataset.inStock === 'true';
+      const inStockB = b.dataset.inStock === 'true';
+
+      // SIEMPRE ordenar por stock primero (con stock antes que sin stock)
+      if (inStockA && !inStockB) return -1;
+      if (!inStockA && inStockB) return 1;
+
+      // Si ambos tienen el mismo estado de stock, aplicar el ordenamiento seleccionado
       const priceA = parseFloat(a.dataset.price);
       const priceB = parseFloat(b.dataset.price);
-      const brandA = a.dataset.brand.toLowerCase();
-      const brandB = b.dataset.brand.toLowerCase();
-      
+      const nameA = a.dataset.name?.toLowerCase() || '';
+      const nameB = b.dataset.name?.toLowerCase() || '';
+
       switch(sortBy) {
         case 'price-asc':
           return priceA - priceB;
         case 'price-desc':
           return priceB - priceA;
         case 'name':
-          return brandA.localeCompare(brandB);
+          return nameA.localeCompare(nameB);
         default:
           return 0;
       }
     });
-    
+
     // Reordenar en el DOM
     items.forEach(item => grid.appendChild(item));
   }

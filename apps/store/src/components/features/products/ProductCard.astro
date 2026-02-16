@@ -23,16 +23,23 @@ const price = product.price || 0;
 const isInStock = (product.stock ?? 0) > 0;
 ---
 
-<a href={`/producto/${product.id}`} class="product-card bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow group relative h-full flex flex-col">
+<a href={`/producto/${product.id}`} class={`product-card bg-white rounded-lg overflow-hidden border transition-shadow group relative h-full flex flex-col ${!isInStock ? 'border-gray-300 opacity-75' : 'border-gray-200 hover:shadow-xl'}`}>
+  <!-- Badge de sin stock -->
+  {!isInStock && (
+    <div class="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+      Sin Stock
+    </div>
+  )}
+
   <!-- Imagen del producto -->
-  <div class="relative bg-white h-48 md:h-56 overflow-hidden flex items-center justify-center p-4 md:p-6">
+  <div class="relative bg-white h-48 md:h-56 overflow-hidden flex items-center justify-center p-4 md:p-6 group/image">
     {product.image_url ? (
       <img
         src={product.image_url}
         alt={product.name}
         loading="lazy"
         decoding="async"
-        class="max-w-full max-h-full object-contain"
+        class={`max-w-full max-h-full object-contain ${!isInStock ? 'grayscale opacity-50' : ''}`}
       />
     ) : (
       <div class="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
@@ -42,9 +49,37 @@ const isInStock = (product.stock ?? 0) > 0;
       </div>
     )}
 
+    <!-- Quick View Button -->
+    <button
+      class="quick-view-btn absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center"
+      onclick="event.preventDefault(); event.stopPropagation();"
+      data-product-id={product.id}
+      data-product-sku={product.sku}
+      data-product-name={product.name}
+      data-product-description={product.description}
+      data-product-price={price}
+      data-product-image={product.image_url}
+      data-product-category={product.category}
+      data-product-brand={product.brand}
+      data-stock={product.stock || 0}
+      aria-label={`Vista rápida de ${product.name}`}
+    >
+      <div class="bg-white rounded-full p-3 hover:bg-provifood-primary hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      </div>
+    </button>
+
     {!isInStock && (
-      <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-        <span class="text-white text-base md:text-lg font-bold">Agotado</span>
+      <div class="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px]">
+        <div class="text-center">
+          <svg class="w-12 h-12 md:w-16 md:h-16 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span class="text-white text-base md:text-lg font-bold">Agotado</span>
+        </div>
       </div>
     )}
   </div>
@@ -102,6 +137,7 @@ const isInStock = (product.stock ?? 0) > 0;
 
 <script>
   import { addToCart, getQuantityInCart } from '@/stores/cart'
+  import { showSuccess, showWarning } from '@/stores/notifications'
   import type { Product } from '@provifood/types'
 
   // Agregar al carrito usando Nanostores
@@ -111,7 +147,10 @@ const isInStock = (product.stock ?? 0) > 0;
         e.preventDefault();
         e.stopPropagation();
 
-        const button = e.currentTarget as HTMLElement;
+        const button = e.currentTarget as HTMLButtonElement;
+
+        // Prevenir clics múltiples
+        if (button.disabled) return;
 
         const product: Product = {
           id: parseInt(button.dataset.productId!),
@@ -125,22 +164,84 @@ const isInStock = (product.stock ?? 0) > 0;
           image_url: button.dataset.productImage || null,
         };
 
-        // Intentar agregar al carrito
-        const success = addToCart(product, 1);
+        // Verificar si el producto ya está en el carrito
+        const wasInCart = getQuantityInCart(product.id) > 0;
 
-        if (success) {
-          // Mostrar confirmación
-          const quantityInCart = getQuantityInCart(product.id);
-          const units = quantityInCart > 1 ? 'es' : '';
-          alert(`✅ ${product.name} agregado al carrito\n\nTienes ${quantityInCart} unidad${units} en tu carrito.`);
-        } else {
-          // Mostrar error (el store ya da warnings en consola)
-          const quantityInCart = getQuantityInCart(product.id);
-          if (quantityInCart > 0) {
-            alert(`⚠️ Stock insuficiente\n\nSolo hay ${product.stock} unidades disponibles de ${product.name}.\nYa tienes ${quantityInCart} en tu carrito.`);
+        // Mostrar estado de loading
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = `
+          <svg class="animate-spin h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        `;
+
+        // Simular un pequeño delay para hacer visible el loading
+        setTimeout(() => {
+          // Intentar agregar al carrito
+          const success = addToCart(product, 1);
+
+          if (success) {
+            // Mostrar confirmación
+            const quantityInCart = getQuantityInCart(product.id);
+            const units = quantityInCart > 1 ? 'es' : '';
+
+            if (wasInCart) {
+              showSuccess(
+                'Cantidad actualizada',
+                `${product.name} - Tienes ${quantityInCart} unidad${units} en tu carrito.`
+              );
+            } else {
+              showSuccess(
+                `${product.name} agregado al carrito`,
+                `Tienes ${quantityInCart} unidad${units} en tu carrito.`
+              );
+            }
           } else {
-            alert(`⚠️ Producto sin stock\n\n${product.name} no está disponible en este momento.`);
+            // Mostrar error (el store ya da warnings en consola)
+            const quantityInCart = getQuantityInCart(product.id);
+            if (quantityInCart > 0) {
+              showWarning(
+                'Stock insuficiente',
+                `Solo hay ${product.stock} unidades disponibles de ${product.name}. Ya tienes ${quantityInCart} en tu carrito.`
+              );
+            } else {
+              showWarning(
+                'Producto sin stock',
+                `${product.name} no está disponible en este momento.`
+              );
+            }
           }
+
+          // Restaurar botón
+          button.disabled = false;
+          button.innerHTML = originalText;
+        }, 300);
+      });
+    });
+
+    // Quick View buttons
+    document.querySelectorAll('.quick-view-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const button = e.currentTarget as HTMLButtonElement;
+        const product: Product = {
+          id: parseInt(button.dataset.productId!),
+          sku: button.dataset.productSku || '',
+          name: button.dataset.productName!,
+          description: button.dataset.productDescription || '',
+          price: parseFloat(button.dataset.productPrice || '0'),
+          category: button.dataset.productCategory || '',
+          brand: button.dataset.productBrand || null,
+          stock: parseInt(button.dataset.stock || '0'),
+          image_url: button.dataset.productImage || null,
+        };
+
+        if (window.showQuickView) {
+          window.showQuickView(product);
         }
       });
     });

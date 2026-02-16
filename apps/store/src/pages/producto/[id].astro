@@ -37,10 +37,19 @@ if (!product) {
 
 const price = product.price || 0;
 const isInStock = (product.stock ?? 0) > 0;
-const stockLevel = product.stock || 0;
+const stockLevel = product.stock ||  0;
+
+// SEO data
+const productDescription = product.description || `${product.name} - ${product.brand ? product.brand + ' - ' : ''}Disponible en Provifood`;
 ---
 
-<Layout title={product.name + ' - Provifood'}>
+<Layout
+  title={product.name}
+  description={productDescription}
+  image={product.image_url}
+  type="product"
+  product={product}
+>
   <TopBar />
   <Navbar />
   <CategoryMenu />
@@ -269,6 +278,10 @@ const stockLevel = product.stock || 0;
 </Layout>
 
 <script>
+  import { addToCart, getQuantityInCart } from '@/stores/cart'
+  import { showSuccess, showWarning } from '@/stores/notifications'
+  import type { Product } from '@provifood/types'
+
   // Manejo de cantidad
   const decreaseBtn = document.getElementById('decrease-qty');
   const increaseBtn = document.getElementById('increase-qty');
@@ -286,17 +299,20 @@ const stockLevel = product.stock || 0;
     increaseBtn.addEventListener('click', () => {
       const currentValue = parseInt(quantityInput.value);
       const maxValue = parseInt(quantityInput.max);
-
-      // Obtener carrito y verificar cantidad disponible real
-      const cart = JSON.parse(localStorage.getItem('provifood-cart') || '[]');
       const productId = addToCartBtn?.dataset.productId;
-      const existingItem = cart.find((item: any) => item.id === productId);
-      const quantityInCart = existingItem?.quantity || 0;
+
+      if (!productId) return;
+
+      // Obtener cantidad ya en el carrito usando el nuevo store
+      const quantityInCart = getQuantityInCart(productId);
       const availableStock = maxValue - quantityInCart;
 
       if (currentValue >= availableStock) {
         const units = availableStock !== 1 ? 'es' : '';
-        alert('⚠️ Stock limitado\n\nSolo puedes agregar ' + availableStock + ' unidad' + units + ' más.\nYa tienes ' + quantityInCart + ' en tu carrito.');
+        showWarning(
+          'Stock limitado',
+          `Solo puedes agregar ${availableStock} unidad${units} más. Ya tienes ${quantityInCart} en tu carrito.`
+        );
         quantityInput.value = String(Math.min(currentValue, availableStock));
         return;
       }
@@ -316,7 +332,10 @@ const stockLevel = product.stock || 0;
         quantityInput.value = String(minValue);
       } else if (currentValue > maxValue) {
         quantityInput.value = String(maxValue);
-        alert('⚠️ Stock limitado\n\nSolo hay ' + maxValue + ' unidades disponibles.');
+        showWarning(
+          'Stock limitado',
+          `Solo hay ${maxValue} unidades disponibles.`
+        );
       }
     });
   }
@@ -324,68 +343,96 @@ const stockLevel = product.stock || 0;
   // Agregar al carrito con validación de stock
   if (addToCartBtn) {
     addToCartBtn.addEventListener('click', () => {
+      const button = addToCartBtn as HTMLButtonElement;
+
+      // Prevenir clics múltiples
+      if (button.disabled) return;
+
       const quantity = parseInt(quantityInput?.value || '1');
-      const productData = {
-        id: addToCartBtn.dataset.productId,
-        name: addToCartBtn.dataset.productName,
-        price: parseFloat(addToCartBtn.dataset.productPrice || '0'),
-        image: addToCartBtn.dataset.productImage,
-        stock: parseInt(addToCartBtn.dataset.stock || '0'),
-        quantity: quantity
+
+      // Crear objeto Product para la función addToCart
+      const product: Product = {
+        id: parseInt(button.dataset.productId!),
+        sku: button.dataset.productSku || '',
+        name: button.dataset.productName!,
+        description: '',
+        price: parseFloat(button.dataset.productPrice || '0'),
+        category: button.dataset.productCategory || '',
+        brand: button.dataset.productBrand || null,
+        stock: parseInt(button.dataset.stock || '0'),
+        image_url: button.dataset.productImage || null,
       };
 
-      // Obtener carrito actual del localStorage
-      const cart = JSON.parse(localStorage.getItem('provifood-cart') || '[]');
+      // Obtener cantidad actual en el carrito
+      const currentQuantityInCart = getQuantityInCart(product.id);
+      const wasInCart = currentQuantityInCart > 0;
 
-      // Verificar si el producto ya está en el carrito
-      const existingItemIndex = cart.findIndex((item: any) => item.id === productData.id);
+      // Mostrar estado de loading
+      const originalHTML = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `
+        <svg class="animate-spin h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      `;
 
-      if (existingItemIndex > -1) {
-        // Verificar stock antes de actualizar cantidad
-        const currentQuantity = cart[existingItemIndex].quantity || 0;
-        const newQuantity = currentQuantity + quantity;
+      // Simular delay para hacer visible el loading
+      setTimeout(() => {
+        // Intentar agregar al carrito usando el store
+        const success = addToCart(product, quantity);
 
-        if (newQuantity > productData.stock) {
-          const availableToAdd = productData.stock - currentQuantity;
-          if (availableToAdd <= 0) {
-            const units = currentQuantity !== 1 ? 'es' : '';
-            alert('⚠️ Stock insuficiente\n\nYa tienes ' + currentQuantity + ' unidad' + units + ' de ' + productData.name + ' en tu carrito.\nNo hay stock adicional disponible.');
-            return;
+        if (success) {
+          // Mostrar confirmación
+          const totalInCart = getQuantityInCart(product.id);
+          const quantityUnits = quantity > 1 ? 'es' : '';
+          const addedForm = quantity > 1 ? 's' : '';
+          const totalUnits = totalInCart > 1 ? 'es' : '';
+
+          if (wasInCart) {
+            showSuccess(
+              'Cantidad actualizada',
+              `${product.name} - Tienes ${totalInCart} unidad${totalUnits} en tu carrito.`
+            );
+          } else {
+            showSuccess(
+              `${product.name} agregado al carrito`,
+              `${quantity} unidad${quantityUnits} agregada${addedForm}. Total en carrito: ${totalInCart} unidad${totalUnits}.`
+            );
           }
-          alert('⚠️ Stock insuficiente\n\nSolo hay ' + productData.stock + ' unidades disponibles.\nYa tienes ' + currentQuantity + ' en tu carrito.\nSolo puedes agregar ' + availableToAdd + ' más.');
-          return;
+
+          // Resetear cantidad a 1
+          if (quantityInput) {
+            quantityInput.value = '1';
+          }
+        } else {
+          // Mostrar error según el caso
+          if (currentQuantityInCart > 0) {
+            const availableToAdd = product.stock - currentQuantityInCart;
+            if (availableToAdd <= 0) {
+              const units = currentQuantityInCart !== 1 ? 'es' : '';
+              showWarning(
+                'Stock insuficiente',
+                `Ya tienes ${currentQuantityInCart} unidad${units} de ${product.name} en tu carrito. No hay stock adicional disponible.`
+              );
+            } else {
+              showWarning(
+                'Stock insuficiente',
+                `Solo hay ${product.stock} unidades disponibles. Ya tienes ${currentQuantityInCart} en tu carrito. Solo puedes agregar ${availableToAdd} más.`
+              );
+            }
+          } else {
+            showWarning(
+              'Stock insuficiente',
+              `Solo hay ${product.stock} unidades disponibles de ${product.name}.`
+            );
+          }
         }
 
-        // Actualizar cantidad
-        cart[existingItemIndex].quantity = newQuantity;
-      } else {
-        // Verificar stock del nuevo producto
-        if (quantity > productData.stock) {
-          alert('⚠️ Stock insuficiente\n\nSolo hay ' + productData.stock + ' unidades disponibles de ' + productData.name + '.');
-          return;
-        }
-
-        // Agregar nuevo producto
-        cart.push(productData);
-      }
-
-      // Guardar en localStorage
-      localStorage.setItem('provifood-cart', JSON.stringify(cart));
-
-      // Mostrar confirmación
-      const totalInCart = cart.find((item: any) => item.id === productData.id)?.quantity || 0;
-      const quantityUnits = quantity > 1 ? 'es' : '';
-      const addedForm = quantity > 1 ? 's' : '';
-      const totalUnits = totalInCart > 1 ? 'es' : '';
-      alert('✅ ' + productData.name + ' agregado al carrito\n\n' + quantity + ' unidad' + quantityUnits + ' agregada' + addedForm + '.\nTotal en carrito: ' + totalInCart + ' unidad' + totalUnits + '.');
-
-      // Actualizar contador del carrito
-      window.dispatchEvent(new Event('cart-updated'));
-
-      // Resetear cantidad a 1
-      if (quantityInput) {
-        quantityInput.value = '1';
-      }
+        // Restaurar botón
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+      }, 300);
     });
   }
 </script>
