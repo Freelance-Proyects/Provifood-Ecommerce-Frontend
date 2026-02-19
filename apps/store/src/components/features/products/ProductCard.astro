@@ -247,7 +247,11 @@ const isInStock = (product.stock ?? 0) > 0;
     });
   }
 
-  // Inicializar al cargar
+  // Exponer para que componentes que cargan datos en cliente (Vue) puedan re-ejecutar
+  if (typeof window !== 'undefined') {
+    (window as any).setupProductCards = setupProductCards;
+  }
   document.addEventListener('DOMContentLoaded', setupProductCards);
   document.addEventListener('astro:page-load', setupProductCards);
+  document.addEventListener('products-rendered', setupProductCards);
 </script>

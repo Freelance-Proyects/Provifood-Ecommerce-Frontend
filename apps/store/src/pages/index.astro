@@ -5,31 +5,28 @@ import Navbar from '../components/layout/Navbar.astro';
 import CategoryMenu from '../components/layout/CategoryMenu.astro';
 import Footer from '../components/layout/Footer.astro';
 import Button from '../components/ui/Button.astro';
-import ProductCard from '../components/features/products/ProductCard.astro';
-import { productsApi } from '../lib/api';
+import FeaturedProductsGrid from '../components/features/products/FeaturedProductsGrid.vue';
 
-// Cargar productos desde la API
-const allProducts = await productsApi.getAll({ limit: 12 });
+import frutasImg from '../assets/categories/Frutas.png';
+import carnesImg from '../assets/categories/carnes.jpg';
+import pescadoImg from '../assets/categories/pescado.jpg';
+import lacteosImg from '../assets/categories/LACTEOS.jpg';
+import panaderiaImg from '../assets/categories/panaderia.jpg';
+import despensaImg from '../assets/categories/despensa_funcional_estanterias_madera.jpg';
+import congeladosImg from '../assets/categories/congelados.jpg';
+import limpiezaImg from '../assets/categories/producos-de-limpieza.jpg';
 
-// Convertir a formato compatible con ProductCard
-const featuredProducts = allProducts
-  .map(product => ({
-    id: product.id,
-    name: product.name,
-    description: product.description || '',
-    price: product.price,
-    image_url: product.image_url || '',
-    stock: product.stock,
-    inStock: product.stock > 0,
-    category: product.category || 'Sin categoría',
-    brand: product.brand || ''
-  }))
-  // Ordenar productos: con stock primero, sin stock al final
-  .sort((a, b) => {
-    if (a.inStock && !b.inStock) return -1;
-    if (!a.inStock && b.inStock) return 1;
-    return 0;
-  });
+// Categorías: título, descripción con personalidad y imagen.
+const categoryCards = [
+  { slug: 'frutas-verduras', title: 'Frutas y Verduras', desc: 'Frescos de temporada para tu negocio', image: frutasImg },
+  { slug: 'carnes-pescados', title: 'Carnes', desc: 'Cortes seleccionados y materia prima de primera', image: carnesImg },
+  { slug: 'carnes-pescados', title: 'Pescados', desc: 'Pescado y mariscos para tu cocina', image: pescadoImg },
+  { slug: 'lacteos', title: 'Lácteos', desc: 'Leche, quesos y derivados con la mejor calidad', image: lacteosImg },
+  { slug: 'panaderia', title: 'Panadería', desc: 'Pan, bollería y repostería para tu despensa', image: panaderiaImg },
+  { slug: 'despensa', title: 'Despensa', desc: 'Aceites, conservas, pastas y abarrotes', image: despensaImg },
+  { slug: 'congelados', title: 'Congelados', desc: 'Conservación óptima y listos para usar', image: congeladosImg },
+  { slug: 'limpieza', title: 'Limpieza e Higiene', desc: 'Todo para mantener tu negocio impecable', image: limpiezaImg },
+];
 ---
 
 <Layout title="Provifood - Distribuidora de Alimentos al Por Mayor y Menor">
@@ -309,11 +306,7 @@ const featuredProducts = allProducts
         </a>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-        {featuredProducts.map((product) => (
-          <ProductCard product={product} />
-        ))}
-      </div>
+      <FeaturedProductsGrid client:load />
 
       <!-- Botón Ver Todos móvil -->
       <div class="mt-6 md:hidden">
@@ -328,50 +321,40 @@ const featuredProducts = allProducts
   </section>
   
   <!-- Sección de categorías principales -->
-  <section class="py-8 md:py-16 bg-white">
+  <section class="py-10 md:py-20 bg-gray-50/50">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-4xl font-bold text-provifood-dark mb-6 md:mb-10 text-center">Compra por Categoría</h2>
+      <h2 class="text-2xl md:text-4xl font-bold text-provifood-dark mb-2 md:mb-3 text-center">Compra por Categoría</h2>
+      <p class="text-provifood-gray text-center text-sm md:text-base max-w-xl mx-auto mb-8 md:mb-12">Encuentra todo lo que necesitas organizado por tipo de producto</p>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-6">
-        <a href="/categoria/harinas" class="group bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-sm">
-            <svg class="w-8 h-8 md:w-10 md:h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <h3 class="font-bold text-center text-provifood-dark text-base md:text-lg">Harinas</h3>
-          <p class="text-xs text-center text-provifood-gray mt-1">y Panificación</p>
-        </a>
-
-        <a href="/categoria/aceites" class="group bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-sm">
-            <svg class="w-8 h-8 md:w-10 md:h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
-          </div>
-          <h3 class="font-bold text-center text-provifood-dark text-base md:text-lg">Aceites</h3>
-          <p class="text-xs text-center text-provifood-gray mt-1">y Grasas</p>
-        </a>
-
-        <a href="/categoria/pastas" class="group bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-sm">
-            <svg class="w-8 h-8 md:w-10 md:h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 class="font-bold text-center text-provifood-dark text-base md:text-lg">Pastas</h3>
-          <p class="text-xs text-center text-provifood-gray mt-1">y Fideos</p>
-        </a>
-
-        <a href="/categoria/arroz" class="group bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-sm">
-            <svg class="w-8 h-8 md:w-10 md:h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <h3 class="font-bold text-center text-provifood-dark text-base md:text-lg">Arroz</h3>
-          <p class="text-xs text-center text-provifood-gray mt-1">y Legumbres</p>
-        </a>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+        {categoryCards.map((cat) => (
+          <a
+            href={`/categoria/${cat.slug}`}
+            class="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-provifood-primary/30 transition-all duration-300"
+          >
+            <div class="relative aspect-[5/4] overflow-hidden bg-gray-100">
+              <img
+                src={typeof cat.image === 'string' ? cat.image : cat.image.src}
+                alt={cat.title}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                loading="lazy"
+                fetchpriority="low"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" aria-hidden="true" />
+            </div>
+            <div class="relative p-4 md:p-5 text-left">
+              <span class="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-provifood-primary">Categoría</span>
+              <h3 class="mt-1 font-bold text-provifood-dark text-lg md:text-xl tracking-tight border-b-2 border-provifood-primary/20 pb-2 w-fit group-hover:border-provifood-primary transition-colors duration-300">{cat.title}</h3>
+              <p class="mt-2 text-sm text-gray-600 leading-relaxed">{cat.desc}</p>
+              <span class="inline-flex items-center gap-1 mt-3 text-provifood-primary font-semibold text-sm group-hover:gap-2 transition-all duration-200">
+                Ver productos
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   </section>
