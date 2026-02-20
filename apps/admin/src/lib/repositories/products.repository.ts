@@ -2,7 +2,8 @@ import { httpClient } from '../http/client'
 import type { Product, ProductStats, ProductFilters } from '@provifood/types'
 
 export class ProductsRepository {
-  private baseUrl = '/products'
+  // Trailing slash evita 307 redirect del backend (FastAPI redirect_slashes) y así no se dispara CORS
+  private baseUrl = '/products/'
 
   async getAll(filters?: ProductFilters): Promise<Product[]> {
     const { data } = await httpClient.get<Product[]>(this.baseUrl, { params: filters })
@@ -10,7 +11,7 @@ export class ProductsRepository {
   }
 
   async getById(id: number): Promise<Product> {
-    const { data } = await httpClient.get<Product>(`${this.baseUrl}/${id}`)
+    const { data } = await httpClient.get<Product>(`${this.baseUrl}${id}`)
     return data
   }
 
@@ -20,16 +21,16 @@ export class ProductsRepository {
   }
 
   async update(id: number, product: Partial<Product>): Promise<Product> {
-    const { data } = await httpClient.put<Product>(`${this.baseUrl}/${id}`, product)
+    const { data } = await httpClient.patch<Product>(`${this.baseUrl}${id}`, product)
     return data
   }
 
   async delete(id: number): Promise<void> {
-    await httpClient.delete(`${this.baseUrl}/${id}`)
+    await httpClient.delete(`${this.baseUrl}${id}`)
   }
 
   async getStats(): Promise<ProductStats> {
-    const { data } = await httpClient.get<ProductStats>(`${this.baseUrl}/stats/summary`)
+    const { data } = await httpClient.get<ProductStats>(`${this.baseUrl}stats/summary`)
     return data
   }
 }

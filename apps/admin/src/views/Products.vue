@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-6">
     <div class="max-w-7xl mx-auto space-y-6">
-      <ProductsHeader @create="store.openCreateModal()" />
+      <ProductsHeader :can-edit="canEdit" @create="store.openCreateModal()" />
 
       <ProductStats :stats="stats || defaultStats" :loading="statsLoading" />
 
@@ -15,6 +15,7 @@
       <ProductTable
         :products="paginatedItems"
         :loading="isLoading"
+        :can-edit="canEdit"
         :page="currentPage"
         :per-page="itemsPerPage"
         :total-pages="totalPages"
@@ -27,6 +28,7 @@
       />
 
       <ProductFormModal
+        v-if="canEdit"
         v-model="store.showCreateModal"
         :product-id="store.selectedProductId"
       />
@@ -42,6 +44,7 @@ import { useDeleteProduct } from '@/composables/queries/useProductMutations'
 import { useProductFilters } from '@/composables/useProductFilters'
 import { useProductPagination } from '@/composables/useProductPagination'
 import { useProductsStore } from '@/stores/products'
+import { useAuthStore } from '@/stores/auth'
 import ProductsHeader from '@/components/products/ProductsHeader.vue'
 import ProductStats from '@/components/products/ProductStats.vue'
 import ProductFilters from '@/components/products/ProductFilters.vue'
@@ -49,6 +52,8 @@ import ProductTable from '@/components/products/ProductTable.vue'
 import ProductFormModal from '@/components/products/ProductFormModal.vue'
 
 const store = useProductsStore()
+const authStore = useAuthStore()
+const canEdit = computed(() => authStore.isAdmin)
 
 // Data fetching with TanStack Query
 const { data: products, isLoading } = useProducts()

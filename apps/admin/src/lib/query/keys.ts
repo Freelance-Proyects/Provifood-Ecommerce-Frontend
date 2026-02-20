@@ -9,4 +9,9 @@ export const queryKeys = {
     detail: (id: number) => [...queryKeys.products.details(), id] as const,
     stats: () => [...queryKeys.products.all, 'stats'] as const,
   },
+  staff: {
+    all: ['staff'] as const,
+    list: () => [...queryKeys.staff.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.staff.all, 'detail', id] as const,
+  },
 }

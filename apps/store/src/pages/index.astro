@@ -16,16 +16,16 @@ import despensaImg from '../assets/categories/despensa_funcional_estanterias_mad
 import congeladosImg from '../assets/categories/congelados.jpg';
 import limpiezaImg from '../assets/categories/producos-de-limpieza.jpg';
 
-// Categorías: título, descripción con personalidad y imagen.
+// Categorías: solo título e imagen (diseño minimalista)
 const categoryCards = [
-  { slug: 'frutas-verduras', title: 'Frutas y Verduras', desc: 'Frescos de temporada para tu negocio', image: frutasImg },
-  { slug: 'carnes-pescados', title: 'Carnes', desc: 'Cortes seleccionados y materia prima de primera', image: carnesImg },
-  { slug: 'carnes-pescados', title: 'Pescados', desc: 'Pescado y mariscos para tu cocina', image: pescadoImg },
-  { slug: 'lacteos', title: 'Lácteos', desc: 'Leche, quesos y derivados con la mejor calidad', image: lacteosImg },
-  { slug: 'panaderia', title: 'Panadería', desc: 'Pan, bollería y repostería para tu despensa', image: panaderiaImg },
-  { slug: 'despensa', title: 'Despensa', desc: 'Aceites, conservas, pastas y abarrotes', image: despensaImg },
-  { slug: 'congelados', title: 'Congelados', desc: 'Conservación óptima y listos para usar', image: congeladosImg },
-  { slug: 'limpieza', title: 'Limpieza e Higiene', desc: 'Todo para mantener tu negocio impecable', image: limpiezaImg },
+  { slug: 'frutas-verduras', title: 'Frutas y Verduras', image: frutasImg },
+  { slug: 'carnes-pescados', title: 'Carnes', image: carnesImg },
+  { slug: 'carnes-pescados', title: 'Pescados', image: pescadoImg },
+  { slug: 'lacteos', title: 'Lácteos', image: lacteosImg },
+  { slug: 'panaderia', title: 'Panadería', image: panaderiaImg },
+  { slug: 'despensa', title: 'Despensa', image: despensaImg },
+  { slug: 'congelados', title: 'Congelados', image: congeladosImg },
+  { slug: 'limpieza', title: 'Limpieza e Higiene', image: limpiezaImg },
 ];
 ---
 
@@ -324,34 +324,32 @@ const categoryCards = [
   <section class="py-10 md:py-20 bg-gray-50/50">
     <div class="container mx-auto px-4">
       <h2 class="text-2xl md:text-4xl font-bold text-provifood-dark mb-2 md:mb-3 text-center">Compra por Categoría</h2>
-      <p class="text-provifood-gray text-center text-sm md:text-base max-w-xl mx-auto mb-8 md:mb-12">Encuentra todo lo que necesitas organizado por tipo de producto</p>
+      <p class="text-provifood-gray text-center text-sm max-w-md mx-auto mb-8 md:mb-12">Todo organizado por tipo de producto</p>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-5">
         {categoryCards.map((cat) => (
           <a
             href={`/categoria/${cat.slug}`}
-            class="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-provifood-primary/30 transition-all duration-300"
+            class="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-lg hover:border-provifood-primary/40 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-provifood-primary/50"
           >
-            <div class="relative aspect-[5/4] overflow-hidden bg-gray-100">
+            <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
               <img
                 src={typeof cat.image === 'string' ? cat.image : cat.image.src}
                 alt={cat.title}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                 loading="lazy"
                 fetchpriority="low"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" aria-hidden="true" />
-            </div>
-            <div class="relative p-4 md:p-5 text-left">
-              <span class="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-provifood-primary">Categoría</span>
-              <h3 class="mt-1 font-bold text-provifood-dark text-lg md:text-xl tracking-tight border-b-2 border-provifood-primary/20 pb-2 w-fit group-hover:border-provifood-primary transition-colors duration-300">{cat.title}</h3>
-              <p class="mt-2 text-sm text-gray-600 leading-relaxed">{cat.desc}</p>
-              <span class="inline-flex items-center gap-1 mt-3 text-provifood-primary font-semibold text-sm group-hover:gap-2 transition-all duration-200">
-                Ver productos
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+              <div class="absolute inset-0 flex flex-col justify-end p-4">
+                <h3 class="font-bold text-white text-base md:text-lg tracking-tight drop-shadow-sm">{cat.title}</h3>
+                <span class="inline-flex items-center gap-1 mt-1.5 text-white/90 font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Ver productos
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
             </div>
           </a>
         ))}

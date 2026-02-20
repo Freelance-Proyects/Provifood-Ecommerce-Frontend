@@ -1,5 +1,6 @@
 ---
-// Footer del sitio
+// Footer del sitio. Dashboard = panel admin (requiere login).
+const dashboardUrl = import.meta.env.PUBLIC_ADMIN_URL || 'http://localhost:5173'
 ---
 
 <footer class="bg-provifood-primary text-white">
@@ -23,7 +24,7 @@
           <li><a href="/productos" class="text-white/80 hover:text-provifood-secondary">Productos</a></li>
           <li><a href="/catalogo" class="text-white/80 hover:text-provifood-secondary">Catálogo 2024</a></li>
           <li><a href="/nosotros" class="text-white/80 hover:text-provifood-secondary">Nosotros</a></li>
-          <li><a href="http://localhost:5173" target="_blank" class="text-white/80 hover:text-provifood-secondary">Dashboard</a></li>
+          <li><a href={dashboardUrl} target="_blank" rel="noopener noreferrer" class="text-white/80 hover:text-provifood-secondary">Dashboard</a></li>
         </ul>
       </div>
       

@@ -31,7 +31,7 @@ export const productsApi = {
     if (cached) return cached
 
     try {
-      const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/products/?${queryParams}`, {
         headers: {
           'Accept': 'application/json',
         },

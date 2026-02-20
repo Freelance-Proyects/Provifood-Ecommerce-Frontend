@@ -1,21 +1,14 @@
 /**
  * Proxy de productos: evita CORS al llamar al backend desde el navegador.
  * El cliente pide /api/products?limit=12 y el servidor reenvía al backend.
- * En desarrollo, si la URL configurada falla, se intenta el backend local (puerto 8000).
+ * El backend corre en Docker local (puerto 8000) y usa Supabase como BD.
  */
 import type { APIRoute } from 'astro';
 
-const DEFAULT_API = 'https://provifood-ecommerce-backend.onrender.com/api/v1';
-const LOCAL_API = 'http://127.0.0.1:8000/api/v1';
-const isDev = import.meta.env.DEV;
+const DEFAULT_API = 'http://localhost:8000/api/v1';
 
 function getBackendBases(): string[] {
-  const configured = import.meta.env.PUBLIC_API_BASE_URL || DEFAULT_API;
-  const bases = [configured];
-  if (isDev && configured !== LOCAL_API) {
-    bases.push(LOCAL_API);
-  }
-  return bases;
+  return [import.meta.env.PUBLIC_API_BASE_URL || DEFAULT_API];
 }
 
 async function fetchFromBackend(backendUrl: string, timeoutMs: number): Promise<Response> {
@@ -35,9 +28,9 @@ async function fetchFromBackend(backendUrl: string, timeoutMs: number): Promise<
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const query = url.searchParams.toString();
-  const path = `/products${query ? `?${query}` : ''}`;
+  const path = `/products/${query ? `?${query}` : ''}`;
   const bases = getBackendBases();
-  const timeoutMs = isDev ? 8000 : 15000;
+  const timeoutMs = 15000;
 
   for (const base of bases) {
     const backendUrl = base.replace(/\/$/, '') + path;
@@ -58,9 +51,6 @@ export const GET: APIRoute = async ({ request }) => {
         },
       });
     } catch (e) {
-      if (isDev && bases.indexOf(base) < bases.length - 1) {
-        continue;
-      }
       console.error('[api/products]', base, e);
     }
   }

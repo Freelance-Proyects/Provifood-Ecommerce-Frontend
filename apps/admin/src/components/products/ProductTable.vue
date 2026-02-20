@@ -14,7 +14,7 @@
             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Precio</th>
             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Stock</th>
             <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
+            <th v-if="canEdit" class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -56,7 +56,7 @@
                 {{ getStockStatus(product.stock).text }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td v-if="canEdit" class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
                 <button
                   @click="$emit('edit', product.id)"
@@ -147,15 +147,19 @@ import { computed } from 'vue'
 import type { Product } from '@provifood/types'
 import SkeletonLoader from '../ui/SkeletonLoader.vue'
 
-const props = defineProps<{
-  products: Product[]
-  loading?: boolean
-  page: number
-  perPage: number
-  totalPages: number
-  totalItems: number
-  visiblePages: number[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    products: Product[]
+    loading?: boolean
+    canEdit?: boolean
+    page: number
+    perPage: number
+    totalPages: number
+    totalItems: number
+    visiblePages: number[]
+  }>(),
+  { canEdit: true }
+)
 
 defineEmits<{
   (e: 'edit', id: number): void

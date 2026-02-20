@@ -9,10 +9,10 @@
         </div>
       </div>
 
-      <!-- Navigation -->
+      <!-- Navigation (Operator solo ve Productos) -->
       <nav class="flex-1 p-4 space-y-2">
         <router-link
-          v-for="item in menuItems"
+          v-for="item in visibleMenuItems"
           :key="item.path"
           :to="item.path"
           class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200"
@@ -25,19 +25,30 @@
         </router-link>
       </nav>
 
-      <!-- User Info -->
-      <div class="p-4 border-t-2 border-gray-200">
+      <!-- User Info + Logout -->
+      <div class="p-4 border-t-2 border-gray-200 space-y-2">
         <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div class="w-10 h-10 bg-provifood-secondary rounded-full flex items-center justify-center">
+          <div class="w-10 h-10 bg-provifood-secondary rounded-full flex items-center justify-center flex-shrink-0">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-semibold text-gray-900">Admin</p>
-            <p class="text-xs text-gray-600">admin@provifood.cl</p>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">{{ authStore.user?.username || 'Usuario' }}</p>
+            <p class="text-xs text-gray-600 truncate">{{ authStore.user?.email || '' }}</p>
+            <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ roleLabel }}</p>
           </div>
         </div>
+        <button
+          type="button"
+          @click="handleLogout"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Cerrar sesión
+        </button>
       </div>
     </aside>
 
@@ -71,27 +82,30 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
-const menuItems = [
-  {
-    path: '/',
-    label: 'Dashboard',
-    icon: 'IconHome'
-  },
-  {
-    path: '/orders',
-    label: 'Pedidos',
-    icon: 'IconOrders'
-  },
-  {
-    path: '/products',
-    label: 'Productos',
-    icon: 'IconProducts'
-  }
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
+}
+
+const allMenuItems = [
+  { path: '/', label: 'Dashboard', icon: 'IconHome', roles: ['admin'] as const },
+  { path: '/orders', label: 'Pedidos', icon: 'IconOrders', roles: ['admin'] as const },
+  { path: '/products', label: 'Productos', icon: 'IconProducts', roles: ['admin', 'operator'] as const },
+  { path: '/users', label: 'Cuentas', icon: 'IconUsers', roles: ['admin'] as const },
 ]
+
+const visibleMenuItems = computed(() => {
+  const role = authStore.user?.role
+  if (!role) return []
+  return allMenuItems.filter((item) => item.roles.includes(role))
+})
 
 const isActive = (path: string) => {
   return route.path === path || (path !== '/' && route.path.startsWith(path))
@@ -101,7 +115,8 @@ const pageTitle = computed(() => {
   const titles: Record<string, string> = {
     '/': 'Dashboard',
     '/orders': 'Gestión de Pedidos',
-    '/products': 'Gestión de Productos'
+    '/products': 'Gestión de Productos',
+    '/users': 'Cuentas de staff'
   }
   return titles[route.path] || 'Provifood Admin'
 })
@@ -110,9 +125,17 @@ const pageDescription = computed(() => {
   const descriptions: Record<string, string> = {
     '/': 'Resumen general del sistema',
     '/orders': 'Administra y gestiona los pedidos de clientes',
-    '/products': 'Administra el catálogo de productos'
+    '/products': authStore.isOperator ? 'Revisar catálogo de productos' : 'Administra el catálogo de productos',
+    '/users': 'Crear, editar y eliminar cuentas de administrador y operador'
   }
   return descriptions[route.path] || ''
+})
+
+const roleLabel = computed(() => {
+  const r = authStore.user?.role
+  if (r === 'admin') return 'Administrador'
+  if (r === 'operator') return 'Operador'
+  return 'Usuario'
 })
 </script>
 
@@ -169,6 +192,24 @@ export const IconProducts = defineComponent({
         'stroke-linejoin': 'round',
         'stroke-width': '2',
         d: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'
+      })
+    ])
+  }
+})
+
+export const IconUsers = defineComponent({
+  setup() {
+    return () => h('svg', {
+      class: 'w-5 h-5',
+      fill: 'none',
+      stroke: 'currentColor',
+      viewBox: '0 0 24 24'
+    }, [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'stroke-width': '2',
+        d: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
       })
     ])
   }
