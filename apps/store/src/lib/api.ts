@@ -2,7 +2,14 @@ import type { Product, ProductFilters } from '@provifood/types'
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL
 
-// Cache simple para reducir llamadas a la API
+// Dual-cache strategy (both are intentional, they serve different purposes):
+//  1. In-memory Map (CACHE_DURATION): prevents redundant fetches within the SAME page session.
+//     e.g. navigating back to the catalog without re-fetching.
+//  2. fetch cache: 'default': leverages browser/CDN HTTP cache ACROSS sessions,
+//     honouring Cache-Control headers from the server.
+//
+// If the backend ever starts sending Cache-Control headers, layer 2 becomes sufficient
+// and layer 1 (the Map + CACHE_DURATION) can be removed.
 const cache = new Map<string, { data: any; timestamp: number }>()
 const CACHE_DURATION = 2 * 60 * 1000 // 2 minutos
 

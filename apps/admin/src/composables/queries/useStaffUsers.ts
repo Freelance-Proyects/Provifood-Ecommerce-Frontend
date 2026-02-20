@@ -3,6 +3,9 @@ import { staffRepository, type CreateStaffUserPayload, type UpdateStaffUserPaylo
 import { queryKeys } from '@/lib/query/keys'
 import { useToast } from '@/composables/useToast'
 
+// Note: HTTP error toasts (4xx/5xx) are handled globally by the Axios interceptor.
+// onError here is only for additional success-context messages, NOT to duplicate HTTP toasts.
+
 export function useStaffUsers() {
   return useQuery({
     queryKey: queryKeys.staff.list(),
@@ -20,10 +23,6 @@ export function useCreateStaffUser() {
       queryClient.invalidateQueries({ queryKey: queryKeys.staff.list() })
       toast.success('Cuenta creada correctamente')
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.detail || err.message
-      toast.error(typeof msg === 'string' ? msg : 'Error al crear la cuenta')
-    },
   })
 }
 
@@ -37,10 +36,6 @@ export function useUpdateStaffUser() {
       queryClient.invalidateQueries({ queryKey: queryKeys.staff.list() })
       toast.success('Cuenta actualizada')
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.detail || err.message
-      toast.error(typeof msg === 'string' ? msg : 'Error al actualizar')
-    },
   })
 }
 
@@ -52,10 +47,6 @@ export function useDeleteStaffUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.staff.list() })
       toast.success('Cuenta eliminada')
-    },
-    onError: (err: any) => {
-      const msg = err.response?.data?.detail || err.message
-      toast.error(typeof msg === 'string' ? msg : 'Error al eliminar')
     },
   })
 }

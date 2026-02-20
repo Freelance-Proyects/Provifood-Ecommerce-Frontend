@@ -162,7 +162,7 @@ import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Modal from '@/components/ui/Modal.vue'
 import { useStaffUsers, useCreateStaffUser, useUpdateStaffUser, useDeleteStaffUser } from '@/composables/queries/useStaffUsers'
-import type { StaffUser } from '@/lib/repositories/staff.repository'
+import type { StaffUser, UpdateStaffUserPayload } from '@/lib/repositories/staff.repository'
 
 const { data: staffUsers, isLoading, isError, refetch } = useStaffUsers()
 const createMutation = useCreateStaffUser()
@@ -217,7 +217,7 @@ function openEdit(u: StaffUser) {
 
 function submitForm() {
   if (editingId.value) {
-    const payload: any = {
+    const payload: UpdateStaffUserPayload = {
       email: form.value.email,
       first_name: form.value.first_name,
       last_name: form.value.last_name,

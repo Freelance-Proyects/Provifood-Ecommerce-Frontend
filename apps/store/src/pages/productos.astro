@@ -1,8 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import TopBar from '../components/layout/TopBar.astro';
-import Navbar from '../components/layout/Navbar.astro';
-import CategoryMenu from '../components/layout/CategoryMenu.astro';
+import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import ProductListGrid from '../components/features/products/ProductListGrid.vue';
 
@@ -17,8 +16,7 @@ const pageDescription = searchQuery
 
 <Layout title={pageTitle} description={pageDescription}>
   <TopBar />
-  <Navbar />
-  <CategoryMenu />
+  <Header />
   
   <main class="bg-gray-50 min-h-screen">
     <!-- Banner Principal -->

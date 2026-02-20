@@ -1,9 +1,7 @@
 import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { getActivePinia } from 'pinia'
 import { useToast } from '@/composables/useToast'
-import { useAuthStore } from '@/stores/auth'
-
-const AUTH_TOKEN_KEY = 'provifood_admin_token'
+import { useAuthStore, AUTH_TOKEN_KEY } from '@/stores/auth'
 
 export function setupInterceptors(client: AxiosInstance) {
   client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -16,7 +14,7 @@ export function setupInterceptors(client: AxiosInstance) {
 
   client.interceptors.response.use(
     (response) => response,
-    (error: AxiosError) => {
+    (error: AxiosError<{ detail?: string; message?: string }>) => {
       const status = error.response?.status
       const url = error.config?.url ?? ''
 
@@ -31,7 +29,8 @@ export function setupInterceptors(client: AxiosInstance) {
       }
 
       const toast = useToast()
-      const message = (error.response?.data as any)?.detail ?? (error.response?.data as any)?.message ?? error.message
+      const responseData = error.response?.data
+      const message = responseData?.detail ?? responseData?.message ?? error.message
 
       switch (status) {
         case 400:

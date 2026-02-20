@@ -1,8 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import TopBar from '../../components/layout/TopBar.astro';
-import Navbar from '../../components/layout/Navbar.astro';
-import CategoryMenu from '../../components/layout/CategoryMenu.astro';
+import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
 import ProductCard from '../../components/features/products/ProductCard.astro';
 import { productsApi } from '../../lib/api';
@@ -154,8 +153,7 @@ const uniqueBrands = [...new Set(products.map(p => p.brand).filter(b => b))].sor
 
 <Layout title={`${currentCategory?.name || 'Categoría'} - Provifood`}>
   <TopBar />
-  <Navbar />
-  <CategoryMenu />
+  <Header />
   
   <main class="bg-gray-50 min-h-screen">
     <!-- Banner de Categoría -->

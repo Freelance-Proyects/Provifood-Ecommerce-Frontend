@@ -176,7 +176,9 @@ export const $cartTax = computed($cartSubtotal, (subtotal) => {
 
 export const $cartTotal = computed(
   [$cartSubtotal, $cartDiscounts, $cartShipping, $cartTax],
-  (subtotal, discounts, shipping, tax) => {
+  (subtotal, discounts, shipping, _tax) => {
+    // Note: _tax is received but NOT added here because Provifood prices already
+    // include IVA (19%). $cartTax is exposed for display purposes only (e.g. receipt breakdown).
     return Math.max(0, subtotal + shipping - discounts)
   }
 )
@@ -203,8 +205,8 @@ export const $estimatedWeight = computed($cartItems, (items) => {
         item.weight.unit === 'kg'
           ? item.weight.value
           : item.weight.unit === 'g'
-          ? item.weight.value / 1000
-          : item.weight.value * 0.453592 // lb to kg
+            ? item.weight.value / 1000
+            : item.weight.value * 0.453592 // lb to kg
       return sum + weightInKg * item.quantity
     }
     return sum

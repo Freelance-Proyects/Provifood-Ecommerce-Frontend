@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
 
-const AUTH_TOKEN_KEY = 'provifood_admin_token'
+export const AUTH_TOKEN_KEY = 'provifood_admin_token'
 const API_BASE = import.meta.env.VITE_API_BASE_URL
 
 export type AuthRole = 'admin' | 'operator' | 'customer'
@@ -86,19 +86,20 @@ export const useAuthStore = defineStore('auth', () => {
       }
       setToken(t)
       return { success: true }
-    } catch (err: any) {
-      const status = err.response?.status
-      const detail = err.response?.data?.detail
+    } catch (err: unknown) {
+      const axiosErr = err as import('axios').AxiosError<{ detail?: string }>
+      const status = axiosErr.response?.status
+      const detail = axiosErr.response?.data?.detail
       if (status === 401) return { success: false, error: 'Correo o contraseña incorrectos.' }
       if (status === 403) return { success: false, error: detail || 'No tienes permiso para acceder.' }
       if (status === 404) return { success: false, error: 'Usuario no encontrado.' }
-      if (err.code === 'ECONNABORTED' || err.message === 'Network Error' || !err.response) {
+      if (axiosErr.code === 'ECONNABORTED' || axiosErr.message === 'Network Error' || !axiosErr.response) {
         return {
           success: false,
           error: 'No se pudo conectar con el servidor. Comprueba que el backend esté en marcha (docker compose up -d en Provifood-Ecommerce-Backend).',
         }
       }
-      return { success: false, error: (typeof detail === 'string' ? detail : null) || err.message || 'Error al iniciar sesión.' }
+      return { success: false, error: (typeof detail === 'string' ? detail : null) || (err instanceof Error ? err.message : null) || 'Error al iniciar sesión.' }
     }
   }
 

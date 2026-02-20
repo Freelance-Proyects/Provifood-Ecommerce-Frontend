@@ -1,5 +1,10 @@
 <template>
   <div class="space-y-6">
+    <!-- DEMO Banner: remove once real API data is integrated -->
+    <div class="flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-sm font-medium">
+      <span class="text-lg">⚠️</span>
+      <span><strong>Datos de demostración</strong> — Las estadísticas y pedidos recientes son ficticios. Reemplazar con integración real al backend antes de producción.</span>
+    </div>
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-for="stat in stats" :key="stat.label" class="bg-white rounded-lg border-2 border-gray-300 shadow-sm p-6 hover:shadow-md transition-shadow">

@@ -11,6 +11,27 @@ const PREFERENCES_STORAGE_KEY = 'provifood-preferences'
 const TOKEN_STORAGE_KEY = 'provifood-token'
 
 // ============================================
+// JWT Utilities
+// ============================================
+
+/**
+ * Decodes the JWT exp claim to check expiry.
+ * This is a UI-only check — the backend always validates the signature.
+ */
+function isTokenExpired(token: string | null): boolean {
+  if (!token) return true
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return true
+    const { exp } = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    if (!exp) return false // Token without exp claim — not considered expired
+    return Date.now() >= exp * 1000
+  } catch {
+    return true // Malformed token — treat as expired
+  }
+}
+
+// ============================================
 // Default Values
 // ============================================
 
@@ -26,7 +47,7 @@ const defaultPreferences: UserPreferences = {
 // Persistent Stores
 // ============================================
 
-export const $user = persistentAtom < UserProfile | null>(
+export const $user = persistentAtom<UserProfile | null>(
   USER_STORAGE_KEY,
   null,
   {
@@ -74,13 +95,28 @@ export const $authError = atom<string | null>(null)
 
 export const $isAuthenticated = atom<boolean>(false)
 
+// ============================================
+// Token Expiry Check on Init
+// ============================================
+
+// If the stored token is expired, clear the session immediately.
+// This prevents stale auth state when the app loads after a long period.
+if (typeof window !== 'undefined') {
+  const storedToken = $authToken.get()
+  if (isTokenExpired(storedToken)) {
+    $user.set(null)
+    $authToken.set(null)
+    $isAuthenticated.set(false)
+  }
+}
+
 // Actualizar isAuthenticated cuando cambie el user o token
 $user.subscribe((user) => {
   $isAuthenticated.set(!!user && !!$authToken.get())
 })
 
 $authToken.subscribe((token) => {
-  $isAuthenticated.set(!!token && !!$user.get())
+  $isAuthenticated.set(!!token && !isTokenExpired(token) && !!$user.get())
 })
 
 // ============================================
@@ -88,16 +124,16 @@ $authToken.subscribe((token) => {
 // ============================================
 
 export async function login(email: string, password: string): Promise<boolean> {
+  // [NOT IMPLEMENTED] — This endpoint path/response shape needs to match the backend.
+  // Backend response is { access_token, token_type }, NOT { user, token }.
+  // This function must be updated before use in production.
   $isLoading.set(true)
   $authError.set(null)
 
   try {
-    // TODO: Reemplazar con llamada real al API
     const response = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
 
@@ -107,6 +143,7 @@ export async function login(email: string, password: string): Promise<boolean> {
 
     const data = await response.json()
 
+    // TODO: Adaptar al formato real del backend: { access_token, token_type }
     $user.set(data.user)
     $authToken.set(data.token)
     $isLoading.set(false)

@@ -1,5 +1,10 @@
 <template>
   <div class="space-y-6">
+    <!-- DEMO Banner -->
+    <div class="flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-sm font-medium">
+      <span class="text-lg">⚠️</span>
+      <span><strong>Datos de demostración</strong> — Esta vista usa pedidos ficticios. Reemplazar con integración real al backend antes de producción.</span>
+    </div>
     <!-- Filters -->
     <div class="bg-white rounded-lg border-2 border-gray-300 shadow-sm p-6">
       <div class="flex flex-wrap gap-4 items-center">
@@ -357,34 +362,27 @@ for (let i = 1231; i >= 1200; i--) {
   })
 }
 
-const filteredOrders = computed(() => {
-  return orders.value
-    .filter(order => {
-      const matchesSearch = searchQuery.value === '' || 
-        order.id.toString().includes(searchQuery.value) ||
-        order.customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        order.customer.address.toLowerCase().includes(searchQuery.value.toLowerCase())
-      
-      const matchesStatus = filterStatus.value === '' || order.status === filterStatus.value
-      
-      return matchesSearch && matchesStatus
-    })
-    .slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage)
-})
-
-const totalPages = computed(() => {
-  const total = orders.value.filter(order => {
-    const matchesSearch = searchQuery.value === '' || 
+// Single filter source of truth — both filteredOrders and totalPages derive from this
+const filteredOrdersAll = computed(() =>
+  orders.value.filter((order) => {
+    const matchesSearch =
+      searchQuery.value === '' ||
       order.id.toString().includes(searchQuery.value) ||
-      order.customer.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    
+      order.customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      order.customer.address.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesStatus = filterStatus.value === '' || order.status === filterStatus.value
-    
     return matchesSearch && matchesStatus
-  }).length
-  
-  return Math.ceil(total / itemsPerPage)
-})
+  })
+)
+
+const filteredOrders = computed(() =>
+  filteredOrdersAll.value.slice(
+    (currentPage.value - 1) * itemsPerPage,
+    currentPage.value * itemsPerPage
+  )
+)
+
+const totalPages = computed(() => Math.ceil(filteredOrdersAll.value.length / itemsPerPage))
 
 const getStatusClass = (status: string) => {
   const classes: Record<string, string> = {

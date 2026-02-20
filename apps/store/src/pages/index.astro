@@ -1,8 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import TopBar from '../components/layout/TopBar.astro';
-import Navbar from '../components/layout/Navbar.astro';
-import CategoryMenu from '../components/layout/CategoryMenu.astro';
+import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import Button from '../components/ui/Button.astro';
 import FeaturedProductsGrid from '../components/features/products/FeaturedProductsGrid.vue';
@@ -33,11 +32,8 @@ const categoryCards = [
   <!-- Barra superior -->
   <TopBar />
   
-  <!-- Navegación principal -->
-  <Navbar />
-  
-  <!-- Menú de categorías -->
-  <CategoryMenu />
+  <!-- Header: Navbar + CategoryMenu sticky juntos -->
+  <Header />
   
   <!-- Hero Section -->
   <section class="bg-provifood-primary text-white">
